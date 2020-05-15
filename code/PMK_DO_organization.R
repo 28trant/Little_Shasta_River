@@ -1,8 +1,7 @@
-# GITHUB PRACTICE
 # SCRIPT to organize and analyze dissolved oxygen (DO) data collected from Peacemaker Ranch (PMK)
 # AKL 2020
 
-# INSTALL Libraries
+# ADD Libraries
 install.packages("dplyr") 
 library(dplyr)
 install.packages("datetime") 
@@ -78,3 +77,100 @@ write.csv(PMK_do, file="C:/GitHub_projects/Little_Shasta_River/data/PMK_processe
 
 
 
+write.csv(PMK_do, file="C:/GitHub_projects/Little_Shasta_River/data/PMK_processed/PMK_DO.csv")
+
+### PLOT time series of DO
+ggplot()+
+  geom_line(data=PMK_do, aes(x=Order, y=DO, color="DO"), group=1) +
+  geom_point(data=PMK_do, aes(x=Order, y=Visit, color="scrub"), size=1.25) +
+  geom_hline(yintercept=5, color="red", size=0.5, linetype="dashed") +
+  labs(title = "PMK Dissolved Oxygen Concentration",
+       x = "2020 Water Year", 
+       y = "DO Concentration (mg/L)") +
+  scale_color_manual(values=c("DO"="slateblue1", "scrub"="black", "threshold"="red")) +
+  scale_y_continuous(limits=c(0, 15)) +
+  scale_x_continuous(breaks=c(0,2364,3708,5683,7069,8029,8701),labels=c(" "="9/27","2364"="11/15","3708"="12/13","5683"="1/23","7069"="2/21","8029"="3/12","8701"="4/15"))+        #run w/o to find breaks
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5,size = 22), 
+        plot.subtitle = element_text(hjust = 0.5, size = 17),
+        axis.title.y = element_text(size=14),
+        axis.title.x = element_text(size=14),
+        legend.title = element_blank(),
+        #legend.position = c(0.8, 0.9),
+        axis.text.x = element_text(size=11.5),
+        axis.text.y = element_text(size=11.5),
+        legend.text = element_text(size=14)) 
+
+### PLOT Time Series of DO vs Temperature
+ggplot()+
+  geom_line(data=PMK_do, aes(x=Order, y=DO, color="DO"), group=1) +
+  geom_point(data=PMK_do, aes(x=Order, y=Visit, color="scrubbed"), size=1.25) +
+  geom_hline(yintercept=5, color="red", size=0.5, linetype="dashed") +
+  geom_line(data=PMK_do, aes(x=Order, y=Temp.C/1.5, color="Temp"), group=1) +
+  labs(title = "PMK Dissolved Oxygen vs. Water Temperature",
+       x = "2020 Water Year", 
+       y = "DO Concentration (mg/L)") +
+  scale_color_manual(values=c("DO"="slateblue3", "scrubbed"="black", "threshold"="red", "Temp" = "deepskyblue")) +
+  scale_y_continuous(limits=c(0, 15)) +
+  scale_x_continuous(breaks=c(0,2364,3708,5683,7069,8029,9651),labels=c(" "="9/27","2364"="11/15","3708"="12/13","5683"="1/23","7069"="2/21","8029"="3/12","9651"="4/15"))+        #run w/o to find breaks
+  scale_y_continuous(sec.axis = sec_axis(~.*1.5, name = "Water Temperature (C)")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5,size = 19), 
+        plot.subtitle = element_text(hjust = 0.5, size = 17),
+        axis.title.y = element_text(size=14),
+        axis.title.x = element_text(size=14),
+        legend.title = element_blank(),
+        #legend.position = c(0.8, 0.9),
+        axis.text.x = element_text(size=11.5),
+        axis.text.y = element_text(size=11.5),
+        legend.text = element_text(size=14)) 
+
+### PLOT time series for winter diversion period (Nov 1-Mar 31)
+ggplot()+
+  geom_line(data=PMK_do, aes(x=Order, y=DO, color="DO"), group=1) +
+  geom_point(data=PMK_do, aes(x=Order, y=Visit, color="scrubbed"), size=1.25) +
+  geom_hline(yintercept=5, color="red", size=0.5, linetype="dashed") +
+  geom_line(data=PMK_do, aes(x=Order, y=Temp.C/1.5, color="Temp"), group=1) +
+  labs(title = "PMK Dissolved Oxygen vs. Water Temperature",
+       x = "2020 Water Year", 
+       y = "DO Concentration (mg/L)") +
+  scale_color_manual(values=c("DO"="slateblue3", "scrubbed"="black", "threshold"="red", "Temp" = "deepskyblue")) +
+  scale_y_continuous(limits=c(0, 15)) +
+  scale_x_continuous(limits=c(1652,8947), breaks=c(1652,2364,3708,5683,7069,8029,8900),labels=c("1652"="11/1","2364"="11/15","3708"="12/13","5683"="1/23","7069"="2/21","8029"="3/12","8900"="3/31"))+        #run w/o to find breaks
+  scale_y_continuous(sec.axis = sec_axis(~.*1.5, name = "Water Temperature (C)")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5,size = 19), 
+        plot.subtitle = element_text(hjust = 0.5, size = 17),
+        axis.title.y = element_text(size=14),
+        axis.title.x = element_text(size=14),
+        legend.title = element_blank(),
+        #legend.position = c(0.8, 0.9),
+        axis.text.x = element_text(size=11.5),
+        axis.text.y = element_text(size=11.5),
+        legend.text = element_text(size=14)) 
+
+
+
+
+###Working
+install.packages("weathermetrics") 
+library(weathermetrics)
+install.packages("data.table") 
+library(data.table)
+install.packages("rlang") 
+library(rlang)
+install.packages("tidyverse") 
+library(tidyverse)
+install.packages("caTools") 
+library(caTools)
+install.packages("pracma") 
+library(pracma)
+library(lubridate)
+
+# PMK_do2$number <- as.character(PMK_do2$number)
+#PMK_do2$DO <- as.character(PMK_do2$DO)
+#PMK_do2$Temp.C <- as.character(PMK_do2$Temp.C)
+# ASSESS flows
+BVR_s %>% top_n(20, CalcFlow.cfs) # highest flows (>25cfs) 12/12-12/13
+BVR_s %>% top_n(10, Temp.C) # search for bad data point (logger out of water, etc.)
+>>>>>>> fd0acc4b7c6fd97e86596fadc9bcc131641a51f2
