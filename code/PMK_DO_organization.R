@@ -72,6 +72,11 @@ PMK_do <- bind_rows(PMK_do1,PMK_do2,PMK_do3,PMK_do4,PMK_do5, PMK_do6) # merge al
 PMK_do$Visit <- ifelse(PMK_do$datapoint==9, PMK_do$DO, NA) #add in field trips days for analysis
 PMK_do$Order <- seq.int(nrow(PMK_do)) # add index column for ease in plotting
   
+# SAVE data as csv file
+write.csv(PMK_do, file="C:/GitHub_projects/Little_Shasta_River/data/PMK_processed/PMK_DO.csv")
+
+
+
 write.csv(PMK_do, file="C:/GitHub_projects/Little_Shasta_River/data/PMK_processed/PMK_DO.csv")
 
 ### PLOT time series of DO
@@ -168,3 +173,4 @@ library(lubridate)
 # ASSESS flows
 BVR_s %>% top_n(20, CalcFlow.cfs) # highest flows (>25cfs) 12/12-12/13
 BVR_s %>% top_n(10, Temp.C) # search for bad data point (logger out of water, etc.)
+>>>>>>> fd0acc4b7c6fd97e86596fadc9bcc131641a51f2
