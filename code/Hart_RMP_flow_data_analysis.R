@@ -54,6 +54,12 @@ LSR_daily_mean_temp <- LSR_temp %>%
 
 #Explore lengths of consecutive days, annual maximums, MWMT, and MWAT by water year
 
+#Annual max
+annual_max_all <- LSR_daily_max_temp %>%
+  group_by(water_year) %>% 
+  arrange(desc(daily_max_C)) %>% 
+  slice(1)
+
 #2017
 LSR_daily_max_temp_2017 <- LSR_daily_max_temp %>% 
   filter(water_year == 2017)
@@ -61,10 +67,6 @@ LSR_daily_max_temp_2017 <- LSR_daily_max_temp %>%
 #Days when temp >20C
 Days_abv_20C_2017 <- LSR_daily_max_temp_2017 %>% 
   filter(daily_max_C >= 20)
-
-#Annual max
-annual_max_2017 <- LSR_daily_max_temp_2017 %>% 
-  slice_max(daily_max_C) #I don't know why this isn't working
 
 #MWMT
 LSR_2017_7DMax <- movingaves(LSR_daily_max_temp_2017$daily_max_C,7)
