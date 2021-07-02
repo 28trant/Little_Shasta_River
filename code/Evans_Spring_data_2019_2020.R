@@ -52,6 +52,15 @@ ggplot(data = Evans_data) +
 
 ggsave("Evans_Spring_discharge.png", path="output/", width=6, height=3.5, units="in", dpi=300)
 
+#check flow data for max/min/mean flow
+flow_filtered <- Evans_data %>%
+  select(DateTime2, water_year, flow_cfs) %>% 
+  filter(!is.na(flow_cfs))
+
+max(flow_filtered$flow_cfs)
+min(flow_filtered$flow_cfs)
+mean(flow_filtered$flow_cfs)
+
 #Temperature
 ggplotly(
   ggplot(data = Evans_data) +
@@ -67,6 +76,16 @@ ggplot(data = Evans_data) +
   theme(axis.text.x = element_text(angle = 90))
 
 ggsave("Evans_Spring_temperature.png", path="output/", width=6, height=3.5, units="in", dpi=300)
+
+#check temp data for max/min/mean flow
+temp_filtered <- Evans_data %>%
+  select(DateTime2, water_year, TEMPERATURE) %>% 
+  filter(!is.na(TEMPERATURE)) %>% 
+  rename(temp_C = TEMPERATURE)
+
+max(temp_filtered$temp_C)
+min(temp_filtered$temp_C)
+mean(temp_filtered$temp_C)
 
 #Water Quality
 Evans_TN <- Evans_WQ %>% 
