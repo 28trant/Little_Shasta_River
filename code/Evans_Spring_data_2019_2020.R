@@ -74,10 +74,54 @@ Evans_TN <- Evans_WQ %>%
 
 #Nitrogen
 ggplot(data = Evans_TN, aes(x = Date3, y = TN_ppm)) +
-  geom_bar(stat = "identity", position = "dodge") #+
-  # geom_hline(yintercept = 0.1, color = "deeppink4") +
-  # labs(x = "date", y = "TN (mg/L)") +
-  # scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
-  # theme_classic()
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0.1, color = "deeppink4") +
+  labs(x = "date", y = "TN (mg/L)") +
+  scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
+  theme_classic()
 
-base_TN
+ggsave("Evans_Spring_TN.png", path = "output/", width=6, height=3.5, units="in", dpi=300)
+
+#TIN
+
+ggplot(data = Evans_WQ, aes(x = Date3, y = `TIN*`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0.05, color = "deeppink4") +
+  labs(x = "date", y = "TIN (mg/L)") +
+  scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
+  theme_classic()
+
+ggsave("Evans_Spring_TIN.png", path = "output/", width=6, height=3.5, units="in", dpi=300)
+
+#TP
+
+ggplot(data = Evans_WQ, aes(x = Date3, y = TP_ppm)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0.05, color = "deeppink4") +
+  labs(x = "date", y = "TP (mg/L)") +
+  scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
+  theme_classic()
+
+ggsave("Evans_Spring_TP.png", path = "output/", width=6, height=3.5, units="in", dpi=300)
+
+#PO4
+
+ggplot(data = Evans_WQ, aes(x = Date3, y = PO4)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0.05, color = "deeppink4") +
+  labs(x = "date", y = expression(paste("PO"[4]," (mg/L)"))) +
+  scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
+  theme_classic()
+
+ggsave("Evans_Spring_PO4.png", path = "output/", width=6, height=3.5, units="in", dpi=300)
+
+#DOC
+
+ggplot(data = Evans_WQ, aes(x = Date3, y = DOC_ppm)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0.5, color = "deeppink4") +
+  labs(x = "date", y = "DOC (mg/L)") +
+  scale_fill_manual("ID", values = c("EVN" = "midnight blue")) +
+  theme_classic()
+
+ggsave("Evans_Spring_DOC.png", path = "output/", width=6, height=3.5, units="in", dpi=300)
