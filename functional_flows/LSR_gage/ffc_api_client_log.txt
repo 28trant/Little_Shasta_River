@@ -1,0 +1,7 @@
+INFO [2021-07-07 15:48:06] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:49:08] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:50:14] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:50:33] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:51:13] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:53:47] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-07 15:54:23] ffcAPIClient Version 0.9.8.2
