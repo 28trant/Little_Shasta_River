@@ -21,18 +21,36 @@ LSR_gage_comid <- 3917198
 
 #Wrangle into correct format for ffc (See sierra_pywr code for guidance)
 LSR_flow_filtered <- LSR_flow %>% 
-  select(date, daily_mean_cfs) %>% 
+  select(daily_mean_cfs, date) %>% 
   rename("flow" = "daily_mean_cfs")
 
-LSR_flow_filtered$date <- ymd(LSR_flow_filtered$date)
+#LSR_flow_filtered$date <- as.POSIXlt(LSR_flow_filtered$date, format = "%Y-%m-%d")
 
 # Run ffc -----------------------------------------------------------------
 
-ffc_lsr$date_format_string <- "%Y-%m-%d"
+#ffc_lsr$date_format_string <- "%Y-%m-%d"
 
 ffc_lsr <- FFCProcessor$new() # make a new object we can use to run the commands
+
+ffc_lsr$flow_field <- "flow"
+
+ffc_lsr$date_format_string <- "%Y-%m-%d"
+
+ffc_lsr$timeseries_enable_filtering <- FALSE
 
 ffc_lsr$step_one_functional_flow_results(timeseries = LSR_flow_filtered,
                                          token = Ann_token,
                                          comid = LSR_gage_comid,
                                          output_folder = "functional_flows/LSR_gage")
+
+# Step 2
+
+ffc_lsr$step_two_explore_ecological_flow_criteria()
+
+
+# Step 3
+
+ffc_lsr$step_three_assess_alteration()
+
+#Read alteration results
+LSR_alteration <- read_csv("functional_flows/3917176_alteration.csv")
