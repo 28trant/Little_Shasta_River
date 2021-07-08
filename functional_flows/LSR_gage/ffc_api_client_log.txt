@@ -5,3 +5,80 @@ INFO [2021-07-07 15:50:33] ffcAPIClient Version 0.9.8.2
 INFO [2021-07-07 15:51:13] ffcAPIClient Version 0.9.8.2
 INFO [2021-07-07 15:53:47] ffcAPIClient Version 0.9.8.2
 INFO [2021-07-07 15:54:23] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:27:18] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:29:38] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:29:51] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:32:05] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:32:18] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:32:44] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:33:35] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:36:45] Using default date format string of %m/%d/%Y
+INFO [2021-07-08 13:36:46] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:43:50] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:53:44] ffcAPIClient Version 0.9.8.2
+INFO [2021-07-08 13:53:44] ### Step 1 - Get Functional Flow Results ###
+INFO [2021-07-08 13:53:44] Retrieving results, please wait...
+INFO [2021-07-08 13:53:45] Using date format string %Y-%m-%d
+INFO [2021-07-08 13:53:53] COMID 3917198 is of stream class HLP - sending parameters to FFC online for that stream class. This may produce different results than if you run data through the FFC yourself using their default parameters.
+INFO [2021-07-08 13:53:56] Results ready.
+INFO [2021-07-08 13:53:56] Writing FFC results as CSVs to functional_flows/LSR_gage
+INFO [2021-07-08 13:53:57] Writing observed plots to functional_flows/LSR_gage
+INFO [2021-07-08 13:54:05] Writing functional_flows/LSR_gage/3917198_DS__observed_only.png
+INFO [2021-07-08 13:54:12] Writing functional_flows/LSR_gage/3917198_FA__observed_only.png
+INFO [2021-07-08 13:54:21] Writing functional_flows/LSR_gage/3917198_Wet__observed_only.png
+INFO [2021-07-08 13:54:38] Writing functional_flows/LSR_gage/3917198_SP__observed_only.png
+INFO [2021-07-08 13:54:50] Writing functional_flows/LSR_gage/3917198_Peak_Tim_observed_only.png
+INFO [2021-07-08 13:54:55] Writing functional_flows/LSR_gage/3917198_Peak_Dur_observed_only.png
+INFO [2021-07-08 13:54:59] Writing functional_flows/LSR_gage/3917198_Peak_Fre_observed_only.png
+INFO [2021-07-08 13:55:07] Writing functional_flows/LSR_gage/3917198_Peak__observed_only.png
+INFO [2021-07-08 13:55:11] Printing Observed/FFC Percentiles. You can also access attributes $ffc_results on this object for the annual values for each metric, $ffc_percentiles for calculated percentile values, and $doh_data for the Dimensionless Observed Hydrograph data.
+INFO [2021-07-08 13:55:11] c(96.3, 282, 6.09896, 7.531147, 3, 14.0901273041927, 53, 0.0374728311112903, 86.2, 31.1854, 138.4, 104, 8.173436, 11.08752, 5.8, 188, 128.4, 183, 3, 1.2, 11, 61.46, 47.5814, 57.92, 3, 1.2, 3)
+INFO [2021-07-08 13:55:11] c(110.25, 282, 6.2474, 8.3278675, 3, 14.0901273041927, 53, 0.0376719456307259, 86.5, 31.90105, 160, 110, 8.53808, 11.90625, 8.5, 188, 144, 183, 3, 1.5, 11, 61.46, 47.5814, 57.92, 3, 1.5, 3)
+INFO [2021-07-08 13:55:11] c(133.5, 282, 6.4948, 9.655735, 3, 14.0901273041927, 53, 0.0380038031631187, 87, 33.0938, 196, 120, 9.14582, 13.2708, 13, 188, 170, 183, 3, 2, 11, 61.46, 47.5814, 57.92, 3, 2, 3)
+INFO [2021-07-08 13:55:11] c(156.75, 282.5, 6.7422, 10.9836025, 3, 14.0901273041927, 53, 0.0424394015815593, 122.5, 49.0469, 196, 151.5, 10.14477, 17.3854, 54.5, 188, 173.25, 183, 3, 12.5, 11, 61.46, 47.5814, 57.92, 3, 4, 3)
+INFO [2021-07-08 13:55:11] c(170.7, 282.8, 6.89064, 11.780323, 3, 14.0901273041927, 53, 0.0451007606326237, 143.8, 58.61876, 196, 170.4, 10.74414, 19.85416, 79.4, 188, 175.2, 183, 3, 18.8, 11, 61.46, 47.5814, 57.92, 3, 5.2, 3)
+INFO [2021-07-08 13:55:11] c("DS_Dur_WS", "DS_Tim", "DS_Mag_50", "DS_Mag_90", "FA_Dur", "FA_Mag", "FA_Tim", "SP_ROC", "SP_Dur", "SP_Mag", "SP_Tim", "Wet_BFL_Dur", "Wet_BFL_Mag_10", "Wet_BFL_Mag_50", "Wet_Tim", "Peak_Tim_10", "Peak_Tim_2", "Peak_Tim_5", "Peak_Dur_10", "Peak_Dur_2", "Peak_Dur_5", "Peak_10", "Peak_2", "Peak_5", "Peak_Fre_10", "Peak_Fre_2", "Peak_Fre_5")
+INFO [2021-07-08 13:55:11] c(3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198)
+INFO [2021-07-08 13:55:11] c("observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed", "observed")
+INFO [2021-07-08 13:55:11] Step 1 complete
+INFO [2021-07-08 15:12:37] ### Step 2 - Explore Ecological Flow Criteria ###
+INFO [2021-07-08 15:12:37] Printing Predicted Percentiles. You can also access attributes $predicted_percentiles on this object for these data.
+INFO [2021-07-08 15:12:37] c(3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198)
+INFO [2021-07-08 15:12:37] c("Peak_Dur_2", "Peak_Dur_5", "Peak_Fre_2", "Peak_Fre_5", "Peak_10", "Peak_2", "Peak_5", "DS_Dur_WS", "DS_Mag_50", "DS_Mag_90", "DS_Tim", "FA_Dur", "FA_Mag", "FA_Tim", "Peak_Dur_10", "Peak_Fre_10", "SP_Dur", "SP_Mag", "SP_ROC", "SP_Tim", "Wet_BFL_Dur", "Wet_BFL_Mag_10", "Wet_BFL_Mag_50", "Wet_Tim")
+INFO [2021-07-08 15:12:37] c(2, 1.8, 1, 1, 179.508476671892, 77.1951282374344, 145.425574009456, 80.495, 0.924005874900795, 1.55068503799847, 263.6975, 2, 7.28845015192934, 6, 1, 1, 40.9733333333333, 25.1676660269105, 0.0394917870142631, 160.965, 59.3875, 1.09338840642764, 5.02643636309669, 22.5)
+INFO [2021-07-08 15:12:37] c(2, 2, 1, 1, 385.27413303198, 124.93420967595, 328.047921391369, 110.447916666667, 3.69972220211014, 4.40382983294311, 284, 3, 14.3594626193723, 16.5833333333333, 1, 1, 57, 52.8665581754188, 0.0472706958927432, 199, 83.8875, 4.06638404219795, 14.1971455689923, 39.84375)
+INFO [2021-07-08 15:12:37] c(5, 3, 2, 1, 610.149251718697, 325.356667789328, 496.397777446952, 148.329166666667, 8.68270192600246, 10.7277862973599, 299.183333333334, 4, 27.49738934575, 32.3166666666666, 1, 1, 77.6458333333333, 90.0345663464571, 0.0555555555555556, 223.45, 120.5625, 10.8320824004898, 32.4971356028388, 73.75)
+INFO [2021-07-08 15:12:37] c(9, 4, 2, 2, 1093.21928335135, 463.025777917589, 793.553623413112, 194.375, 14.5404708410191, 21.2758531780023, 315.925, 6, 46.8406489496779, 46.53125, 1, 1, 99, 171.120068428926, 0.0669819195397159, 239, 174.458333333333, 19.8606566801604, 48.2949937543415, 117.7125)
+INFO [2021-07-08 15:12:37] c(19, 4.4, 4, 2, 1621.36155139604, 787.46887246666, 1140.30522610344, 227.145, 19.5860578712166, 35.1986238206786, 333.640833333333, 8, 74.0681513450715, 60.6083333333333, 2, 1.5, 127.426666666667, 308.161853050953, 0.0814108947291023, 250.615, 210.925, 27.6987003367553, 68.9665049129196, 148.656666666666)
+INFO [2021-07-08 15:12:37] c("inferred", "inferred", "inferred", "inferred", "model", "model", "model", "model", "model", "model", "model", "obs", "model", "model", "obs", "obs", "model", "model", "obs", "model", "model", "model", "model", "model")
+INFO [2021-07-08 15:12:37] c("predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted", "predicted")
+INFO [2021-07-08 15:12:37] Writing Predicted Percentiles as CSV to functional_flows/LSR_gage
+INFO [2021-07-08 15:12:37] Writing predicted metric plots to functional_flows/LSR_gage
+INFO [2021-07-08 15:12:38] Writing functional_flows/LSR_gage/3917198_DS__predicted_only.png
+INFO [2021-07-08 15:12:40] Writing functional_flows/LSR_gage/3917198_FA__predicted_only.png
+INFO [2021-07-08 15:12:41] Writing functional_flows/LSR_gage/3917198_Wet__predicted_only.png
+INFO [2021-07-08 15:12:43] Writing functional_flows/LSR_gage/3917198_SP__predicted_only.png
+INFO [2021-07-08 15:12:45] Skipping plot for Peak_Tim. No data
+INFO [2021-07-08 15:12:45] Writing functional_flows/LSR_gage/3917198_Peak_Dur_predicted_only.png
+INFO [2021-07-08 15:12:47] Writing functional_flows/LSR_gage/3917198_Peak_Fre_predicted_only.png
+INFO [2021-07-08 15:12:49] Writing functional_flows/LSR_gage/3917198_Peak__predicted_only.png
+INFO [2021-07-08 15:12:50] Step 2 complete
+INFO [2021-07-08 15:12:52] ### Step 3 - Assess Alteration ###
+INFO [2021-07-08 15:12:52] Printing alteration assessment data. You can also access attributes $alteration on this object for these data
+INFO [2021-07-08 15:12:52] c("DS_Dur_WS", "DS_Tim", "DS_Mag_50", "DS_Mag_90", "FA_Dur", "FA_Mag", "FA_Tim", "SP_ROC", "SP_Dur", "SP_Mag", "SP_Tim", "Wet_BFL_Dur", "Wet_BFL_Mag_10", "Wet_BFL_Mag_50", "Wet_Tim", "Peak_Dur_10", "Peak_Dur_2", "Peak_Dur_5", "Peak_10", "Peak_2", "Peak_5", "Peak_Fre_10", "Peak_Fre_2", "Peak_Fre_5")
+INFO [2021-07-08 15:12:52] c(1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, -1, -1, 0, -1, -1, -1, -1, -1, 1, -1)
+INFO [2021-07-08 15:12:52] c("likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_altered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_unaltered", "likely_altered", "likely_altered", "indeterminate", "likely_altered", "likely_altered", "likely_altered", "likely_altered", "likely_altered", "likely_unaltered", "likely_altered")
+INFO [2021-07-08 15:12:52] c("none_found", "none_found", "none_found", "none_found", "none_found", "none_found", "none_found", "low", "none_found", "none_found", "none_found", "none_found", "none_found", "none_found", "early", "high", "unknown", "high", "low", "low", "low", "high", "none_found", "high")
+INFO [2021-07-08 15:12:52] c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)
+INFO [2021-07-08 15:12:52] c(3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198, 3917198)
+INFO [2021-07-08 15:12:52] Writing alteration assessment as CSV to functional_flows/LSR_gage
+INFO [2021-07-08 15:12:52] Writing comparison plots to functional_flows/LSR_gage
+INFO [2021-07-08 15:12:53] Writing functional_flows/LSR_gage/3917198_DS_.png
+INFO [2021-07-08 15:12:55] Writing functional_flows/LSR_gage/3917198_FA_.png
+INFO [2021-07-08 15:12:56] Writing functional_flows/LSR_gage/3917198_Wet_.png
+INFO [2021-07-08 15:12:59] Writing functional_flows/LSR_gage/3917198_SP_.png
+INFO [2021-07-08 15:13:01] Writing functional_flows/LSR_gage/3917198_Peak_Tim.png
+INFO [2021-07-08 15:13:04] Writing functional_flows/LSR_gage/3917198_Peak_Dur.png
+INFO [2021-07-08 15:13:06] Writing functional_flows/LSR_gage/3917198_Peak_Fre.png
+INFO [2021-07-08 15:13:08] Writing functional_flows/LSR_gage/3917198_Peak_.png
+INFO [2021-07-08 15:13:10] Step 3 complete
