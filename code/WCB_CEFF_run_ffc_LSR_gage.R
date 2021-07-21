@@ -9,7 +9,7 @@
 library(ffcAPIClient)
 library(tidyverse)
 library(lubridate)
-
+library(plotly)
 
 # Load data ---------------------------------------------------------------
 
@@ -18,6 +18,13 @@ LSR_flow <- read_csv("data/LSR_processed/LSR_flow_2017_2020.csv")
 Ann_token <- "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJBbm4iLCJsYXN0TmFtZSI6IldpbGxpcyIsImVtYWlsIjoiYXdpbGxpc0B1Y2RhdmlzLmVkdSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNjA1NjUxMTc4fQ.MzMJ23D6tRmOD9Sr3OcQoCVLLndsV2w5ZKdzwgDOeOM"
 
 LSR_gage_comid <- 3917198
+
+# Plot to confirm full dataset
+ggplotly(
+  ggplot() + geom_line(data = LSR_flow, aes(x=date, y=daily_mean_cfs), color = "royalblue3") +
+    labs(x = "date", y = "discharge (cfs)") +
+    theme_bw()
+)
 
 #Wrangle into correct format for ffc (See sierra_pywr code for guidance)
 LSR_flow_filtered <- LSR_flow %>% 
