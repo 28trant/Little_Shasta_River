@@ -65,6 +65,8 @@ Evans_data_all$flow_cfs <- 185.32*Evans_data_all$stage_m^2.2756
 
 #plot and review
 
+
+
 ggplotly(
   ggplot(data = Evans_data_all) +
     geom_line(aes(x = date_time, y = flow_cfs), color = "midnightblue")
@@ -77,12 +79,17 @@ Evans_data_all_QA <- Evans_data_all %>%
 
 ggplotly(
   ggplot(data = Evans_data_all_QA) +
+    geom_line(aes(x = date_time, y = stage_m), color = "midnightblue")
+)
+
+ggplotly(
+  ggplot(data = Evans_data_all_QA) +
     geom_line(aes(x = date_time, y = flow_cfs), color = "midnightblue")
 )
 
 ggplotly(
   ggplot(data = Evans_data_all_QA) +
-    geom_line(aes(x = date_time, y = temp_C), color = "midnightblue")
+    geom_line(aes(x = date_time, y = temp_C), color = "mediumvioletred")
 )
 
 
