@@ -8,7 +8,7 @@
 
 library(tidyverse)
 library(sf) #used to load and read spatial data
-library(mapshaper) #used to merge stream segments into single line
+library(mapview)
 library(mapedit) #used to create a layer of all cross-sections
 library(sp) #required for raster package
 library(raster) #used to convert sf layer to raster, then extract DEM data from that
@@ -54,10 +54,11 @@ ggplot() +
   geom_sf(data = LSR_clipped) +
   coord_sf()
 
-#Use clipped streamline to create a buffered area from which to draw cross-sections and extract DEM data
+#Combine stream segments into one. Use clipped streamline to create a buffered area from which to draw cross-sections and extract DEM data
 
 LSR_buffer <- LSR_clipped %>% 
-  st_buffer(dist = 100)
+  st_combine() %>% 
+  st_buffer(dist = 500)
 
 #plot and see if buffer was successfully made
 ggplot() +
@@ -65,4 +66,35 @@ ggplot() +
   geom_sf(data = LSR_buffer) +
   coord_sf()
 
-#The buffer shows that the individual segments of the streamline did not merge. Ust te ms_dissolve function in mapshaper to resolve. Need to update R version first.
+# Nice! Now make a shp file of cross-sections
+
+# SKIP - Draw and save cross-sections --------------------------------------------
+#These lines commented out so that the dataframe is not accidentally overwritten. Commented code saved for posterity.
+
+#LSR_xsxns <- mapview(LSR_buffer) %>% 
+#  editMap()
+
+# LSR_xsxns_object <- LSR_xsxns$finished
+# 
+# # LSR_xsxns_sf <- LSR_xsxns_object %>% 
+# #   select(geometry)
+# 
+# #view buffer and cross-sections
+# mapview(LSR_buffer) +
+#   mapview(LSR_xsxns_object)
+# 
+# #Save object of cross-sections
+# save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
+
+
+# Clip raster -------------------------------------------------------------
+
+load("data/GIS/LSR_xsxns.rda")
+
+#Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
+
+library(tiff)
+
+LSR_tiff <- "X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif"
+
+imported_raster=raster('X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif')
