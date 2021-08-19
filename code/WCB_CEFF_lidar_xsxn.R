@@ -68,21 +68,33 @@ ggplot() +
 
 # Nice! Now make a shp file of cross-sections
 
-# Draw and save cross-sections --------------------------------------------
+# SKIP - Draw and save cross-sections --------------------------------------------
 #These lines commented out so that the dataframe is not accidentally overwritten. Commented code saved for posterity.
 
 #LSR_xsxns <- mapview(LSR_buffer) %>% 
 #  editMap()
 
-LSR_xsxns_object <- LSR_xsxns$finished
+# LSR_xsxns_object <- LSR_xsxns$finished
+# 
+# # LSR_xsxns_sf <- LSR_xsxns_object %>% 
+# #   select(geometry)
+# 
+# #view buffer and cross-sections
+# mapview(LSR_buffer) +
+#   mapview(LSR_xsxns_object)
+# 
+# #Save object of cross-sections
+# save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
 
-# LSR_xsxns_sf <- LSR_xsxns_object %>% 
-#   select(geometry)
 
-#view buffer and cross-sections
-mapview(LSR_buffer) +
-  mapview(LSR_xsxns_object)
+# Clip raster -------------------------------------------------------------
 
-#Save object of cross-sections
-save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
+load("data/GIS/LSR_xsxns.rda")
 
+#Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
+
+library(tiff)
+
+LSR_tiff <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
+
+imported_raster=raster('X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif')
