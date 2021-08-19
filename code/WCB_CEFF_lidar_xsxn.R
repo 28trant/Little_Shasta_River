@@ -95,6 +95,6 @@ load("data/GIS/LSR_xsxns.rda")
 
 library(tiff)
 
-LSR_tiff <- "X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif"
+LSR_tiff <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
 
-imported_raster=raster('X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif')
+imported_raster=raster('X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif')
