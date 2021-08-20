@@ -13,6 +13,7 @@ library(mapedit) #used to create a layer of all cross-sections
 library(sp) #required for raster package
 library(raster) #used to convert sf layer to raster, then extract DEM data from that
 library(elevatr) #used to extract DEM data
+library(rgdal)
 
 #in the future, the lidR package can be used to directly read the las files. The work to merge the individual LiDAR tiles for the Little Shasta into a single layer was already completed with ArcMap 10.5.
 
@@ -87,14 +88,54 @@ ggplot() +
 # save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
 
 
-# Clip raster -------------------------------------------------------------
+# Extract xsxn elevations from raster -------------------------------------------------------------
 
 load("data/GIS/LSR_xsxns.rda")
 
+#Plot to make sure cross-sections exist
+
+ggplot() +
+  geom_sf(data = LSR_LiDAR_boundary_clip) +
+  geom_sf(data = LSR_buffer) +
+  geom_sf(data = LSR_xsxns_object) +
+  coord_sf()
+
 #Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
 
-library(tiff)
+#library(tiff)
 
-LSR_tiff <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
+LSR_path <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
 
-imported_raster=raster('X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif')
+LSR_tiff=raster(LSR_path)
+
+#Add original projection to raster
+LSR_nad83 <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs"
+
+#check projection of raster
+crs(LSR_tiff)
+
+#Confirm projection of buffer layer
+st_crs(LSR_buffer)
+
+#convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
+# LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
+
+#confirm new projection
+# crs(LSR_tiff_UTM)
+
+#save raster with UTM projection
+# writeRaster(LSR_tiff_UTM, filename = "data/GIS/LSR_tiff_UTM.tif")
+
+#extract elevations of cross-sections from raster
+# xsxn_elevation <- extract(LSR_tiff, LSR_xsxns_object)
+
+# save(xsxn_elevation, file = "data/GIS/xsxn_elevation.rda")
+
+
+# Review xsxns and save final files ---------------------------------------
+
+load("data/GIS/xsxn_elevation.rda")
+
+as.data.frame(xsxn_elevation)
+
+#Seems like having cross-sections with different lengths may be a problem (differing numbers of rows). Check with Ryan whether this is something we can resolve, or if I need to do this again. 
