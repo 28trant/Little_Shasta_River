@@ -13,6 +13,10 @@ library(mapedit) #used to create a layer of all cross-sections
 library(sp) #required for raster package
 library(raster) #used to convert sf layer to raster, then extract DEM data from that
 library(elevatr) #used to extract DEM data
+library(rgdal)
+library(purrr)
+library(plotly)
+library(data.table) #used to extract minimum points from xsxns
 
 #in the future, the lidR package can be used to directly read the las files. The work to merge the individual LiDAR tiles for the Little Shasta into a single layer was already completed with ArcMap 10.5.
 
@@ -87,14 +91,100 @@ ggplot() +
 # save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
 
 
-# Clip raster -------------------------------------------------------------
+# Extract xsxn elevations from raster -------------------------------------------------------------
 
 load("data/GIS/LSR_xsxns.rda")
 
+#Plot to make sure cross-sections exist
+
+ggplot() +
+  geom_sf(data = LSR_LiDAR_boundary_clip) +
+  geom_sf(data = LSR_buffer) +
+  geom_sf(data = LSR_xsxns_object) +
+  coord_sf()
+
 #Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
 
-library(tiff)
+#library(tiff)
 
-LSR_tiff <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
+LSR_path <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
 
-imported_raster=raster('X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif')
+LSR_tiff=raster(LSR_path)
+
+#Add original projection to raster
+LSR_nad83 <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs"
+
+#check projection of raster
+crs(LSR_tiff)
+
+#Confirm projection of buffer layer
+st_crs(LSR_buffer)
+
+#convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
+# LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
+
+#confirm new projection
+# crs(LSR_tiff_UTM)
+
+#save raster with UTM projection
+# writeRaster(LSR_tiff_UTM, filename = "data/GIS/LSR_tiff_UTM.tif")
+
+#extract elevations of cross-sections from raster
+# xsxn_elevation <- extract(LSR_tiff, LSR_xsxns_object)
+
+# save(xsxn_elevation, file = "data/GIS/xsxn_elevation.rda")
+
+
+# Review xsxns and save final files ---------------------------------------
+
+load("data/GIS/xsxn_elevation.rda")
+
+xsxn_elevation <- set_names(xsxn_elevation, LSR_xsxns_object$X_leaflet_id)
+names(xsxn_elevation)
+
+xsxn_list <- map(xsxn_elevation, ~as.data.frame(.x))
+xsxn_list <- xsxn_list %>% 
+  mutate(rowid = map(., ~mutate(.x, seq(0,nrow(.x), by = 0.4572))))
+
+map(xsxn_list, ~nrow(.x))
+
+xsxn_df <- bind_rows(xsxn_list, .id = "X_leaflet_id") %>% 
+  mutate(elevation_m = .x) %>% 
+  filter(!is.na(elevation_m)) %>% 
+  mutate(X_leaflet_id = as.integer(X_leaflet_id)) %>% 
+  group_by(X_leaflet_id) %>% 
+  mutate(rowid = row_number()) %>% 
+  mutate(location = row_number()*0.4572) #this takes the rowid and scales it to the 1.5 ft interval of the lidar data; multiplying by the m conversion since the layer projections were converted to UTMs
+
+summary(xsxn_df)
+
+xsxn_df %>% 
+  group_by(X_leaflet_id) %>% 
+  tally() %>% 
+  view()
+
+xsxn_sf <- left_join(LSR_xsxns_object, xsxn_df)
+
+ggplotly(
+ggplot(data = xsxn_df) +
+  geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
+)
+
+#Identify where stream channel is in each cross-section; trim each xsxn to focus on stream channel to make it easier to examine for any downcutting.
+
+#convert dataframe to datatable to extract whole row with minimum elevations
+xsxn_dt <- data.table(xsxn_df)
+
+#find lowest point on each xsxn
+xsxn_min_all <- xsxn_dt[ , .SD[which.min(elevation_m)], by = X_leaflet_id]
+
+#explore single cross-section: 413
+xsxn_413 <- xsxn_df %>% 
+  filter(X_leaflet_id == 413)
+
+LSR_lidar_UTM <- "data/GIS/LSR_tiff_UTM.tif"
+
+LSR_lidar_UTM_raster <- raster(LSR_lidar_UTM)
+
+mapview(LSR_lidar_UTM_raster) +
+  mapview(xsxn_sf)
