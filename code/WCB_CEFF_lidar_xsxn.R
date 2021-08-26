@@ -14,6 +14,9 @@ library(sp) #required for raster package
 library(raster) #used to convert sf layer to raster, then extract DEM data from that
 library(elevatr) #used to extract DEM data
 library(rgdal)
+library(purrr)
+library(plotly)
+library(data.table) #used to extract minimum points from xsxns
 
 #in the future, the lidR package can be used to directly read the las files. The work to merge the individual LiDAR tiles for the Little Shasta into a single layer was already completed with ArcMap 10.5.
 
@@ -136,6 +139,52 @@ st_crs(LSR_buffer)
 
 load("data/GIS/xsxn_elevation.rda")
 
-as.data.frame(xsxn_elevation)
+xsxn_elevation <- set_names(xsxn_elevation, LSR_xsxns_object$X_leaflet_id)
+names(xsxn_elevation)
 
-#Seems like having cross-sections with different lengths may be a problem (differing numbers of rows). Check with Ryan whether this is something we can resolve, or if I need to do this again. 
+xsxn_list <- map(xsxn_elevation, ~as.data.frame(.x))
+xsxn_list <- xsxn_list %>% 
+  mutate(rowid = map(., ~mutate(.x, seq(0,nrow(.x), by = 0.4572))))
+
+map(xsxn_list, ~nrow(.x))
+
+xsxn_df <- bind_rows(xsxn_list, .id = "X_leaflet_id") %>% 
+  mutate(elevation_m = .x) %>% 
+  filter(!is.na(elevation_m)) %>% 
+  mutate(X_leaflet_id = as.integer(X_leaflet_id)) %>% 
+  group_by(X_leaflet_id) %>% 
+  mutate(rowid = row_number()) %>% 
+  mutate(location = row_number()*0.4572) #this takes the rowid and scales it to the 1.5 ft interval of the lidar data; multiplying by the m conversion since the layer projections were converted to UTMs
+
+summary(xsxn_df)
+
+xsxn_df %>% 
+  group_by(X_leaflet_id) %>% 
+  tally() %>% 
+  view()
+
+xsxn_sf <- left_join(LSR_xsxns_object, xsxn_df)
+
+ggplotly(
+ggplot(data = xsxn_df) +
+  geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
+)
+
+#Identify where stream channel is in each cross-section; trim each xsxn to focus on stream channel to make it easier to examine for any downcutting.
+
+#convert dataframe to datatable to extract whole row with minimum elevations
+xsxn_dt <- data.table(xsxn_df)
+
+#find lowest point on each xsxn
+xsxn_min_all <- xsxn_dt[ , .SD[which.min(elevation_m)], by = X_leaflet_id]
+
+#explore single cross-section: 413
+xsxn_413 <- xsxn_df %>% 
+  filter(X_leaflet_id == 413)
+
+LSR_lidar_UTM <- "data/GIS/LSR_tiff_UTM.tif"
+
+LSR_lidar_UTM_raster <- raster(LSR_lidar_UTM)
+
+mapview(LSR_lidar_UTM_raster) +
+  mapview(xsxn_sf)
