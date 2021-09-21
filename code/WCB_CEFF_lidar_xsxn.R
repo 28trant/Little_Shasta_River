@@ -75,21 +75,52 @@ ggplot() +
 # SKIP - Draw and save cross-sections --------------------------------------------
 #These lines commented out so that the dataframe is not accidentally overwritten. Commented code saved for posterity.
 
-#LSR_xsxns <- mapview(LSR_buffer) %>% 
-#  editMap()
+LSR_xsxns <- mapview(LSR_buffer) %>%
+  editMap()
 
-# LSR_xsxns_object <- LSR_xsxns$finished
-# 
-# # LSR_xsxns_sf <- LSR_xsxns_object %>% 
-# #   select(geometry)
-# 
-# #view buffer and cross-sections
-# mapview(LSR_buffer) +
-#   mapview(LSR_xsxns_object)
-# 
-# #Save object of cross-sections
-# save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
+LSR_xsxns_object <- LSR_xsxns$finished
 
+LSR_xsxns_sf <- LSR_xsxns_object %>%
+   select(geometry)
+
+#view buffer and cross-sections
+mapview(LSR_buffer) +
+ mapview(LSR_xsxns_object)
+
+#Save object of cross-sections
+save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
+
+
+
+# SKIP - Load raster tiff and convert projection to UTM -------------------
+
+#Following lines are to load the TIF and convert to UTM, which was already completed on the first run. Commented out, but saved for posterity.
+
+#Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
+
+#library(tiff)
+
+# LSR_path <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
+# 
+# LSR_tiff=raster(LSR_path)
+# 
+# #Add original projection to raster
+# LSR_nad83 <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs"
+# 
+# #check projection of raster
+# crs(LSR_tiff)
+# 
+# #Confirm projection of buffer layer
+# st_crs(LSR_buffer)
+
+#convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
+# LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
+# 
+# #confirm new projection
+# crs(LSR_tiff_UTM)
+# 
+# #save raster with UTM projection
+# writeRaster(LSR_tiff_UTM, filename = "data/GIS/LSR_tiff_UTM.tif")
 
 # Extract xsxn elevations from raster -------------------------------------------------------------
 
@@ -103,36 +134,14 @@ ggplot() +
   geom_sf(data = LSR_xsxns_object) +
   coord_sf()
 
-#Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
+LSR_tiff_UTM_path <- "C:/Users/fissekis/Documents/GitHub_projects/Little_Shasta_River/data/GIS/LSR_tiff_UTM.tif"
 
-#library(tiff)
-
-LSR_path <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
-
-LSR_tiff=raster(LSR_path)
-
-#Add original projection to raster
-LSR_nad83 <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs"
-
-#check projection of raster
-crs(LSR_tiff)
-
-#Confirm projection of buffer layer
-st_crs(LSR_buffer)
-
-#convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
-# LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
-
-#confirm new projection
-# crs(LSR_tiff_UTM)
-
-#save raster with UTM projection
-# writeRaster(LSR_tiff_UTM, filename = "data/GIS/LSR_tiff_UTM.tif")
+LSR_tiff_UTM=raster(LSR_tiff_UTM_path)
 
 #extract elevations of cross-sections from raster
-# xsxn_elevation <- extract(LSR_tiff, LSR_xsxns_object)
+xsxn_elevation <- extract(LSR_tiff_UTM, LSR_xsxns_object)
 
-# save(xsxn_elevation, file = "data/GIS/xsxn_elevation.rda")
+save(xsxn_elevation, file = "data/GIS/xsxn_elevation.rda")
 
 
 # Review xsxns and save final files ---------------------------------------
@@ -170,21 +179,4 @@ ggplot(data = xsxn_df) +
   geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
 )
 
-#Identify where stream channel is in each cross-section; trim each xsxn to focus on stream channel to make it easier to examine for any downcutting.
-
-#convert dataframe to datatable to extract whole row with minimum elevations
-xsxn_dt <- data.table(xsxn_df)
-
-#find lowest point on each xsxn
-xsxn_min_all <- xsxn_dt[ , .SD[which.min(elevation_m)], by = X_leaflet_id]
-
-#explore single cross-section: 413
-xsxn_413 <- xsxn_df %>% 
-  filter(X_leaflet_id == 413)
-
-LSR_lidar_UTM <- "data/GIS/LSR_tiff_UTM.tif"
-
-LSR_lidar_UTM_raster <- raster(LSR_lidar_UTM)
-
-mapview(LSR_lidar_UTM_raster) +
-  mapview(xsxn_sf)
+#seems like not every cross-section includes the whole stream channel. May need to redraw cross-sections. Note that I can re-import the UTM.tiff file, and not go through the conversion step. This will save a lot of time!
