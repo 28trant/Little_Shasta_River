@@ -6,10 +6,10 @@
 
 # Libraries ---------------------------------------------------------------
 
-library(tidyverse)
-library(lubridate)
-library(lfstat)
-library(plotly)
+library(tidyverse) #this package is used for basic data wrangling and plotting
+library(lubridate) #this package is used to convert date formats and make them easier to work with
+library(lfstat) #this package has the code to automatically calculate water year from a date
+library(plotly) #this package enables us to make interactive plots
 library(accelerometry)
 
 
