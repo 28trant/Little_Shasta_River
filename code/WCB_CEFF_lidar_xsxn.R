@@ -27,6 +27,8 @@ library(data.table) #used to extract minimum points from xsxns
 
 LSR_LiDAR_boundary <- st_read("data/GIS/LSR_LiDAR_boundary.shp")
 LSR_streamline <- st_read("data/GIS/Little_Shasta_waterways_1.shp")
+LSR_LOIs <- readRDS("data/GIS/07_lshasta_loi_comids_flowline.rds")
+
 
 LSR_LiDAR_boundary_UTM <- st_transform(LSR_LiDAR_boundary, crs = 32610)
 
@@ -41,6 +43,7 @@ LSR_streamline_UTM <- st_transform(LSR_streamline, crs = 32610)
 ggplot() +
   geom_sf(data = LSR_LiDAR_boundary_UTM) +
   geom_sf(data = LSR_streamline_UTM) +
+  geom_sf(data = LSR_LOIs) +
   coord_sf()
 
 # Wrangle spatial data ----------------------------------------------------
@@ -50,6 +53,8 @@ LSR_LiDAR_boundary_clip <- st_zm(LSR_LiDAR_boundary_UTM)
 
 LSR_streamline_clip <- st_zm(LSR_streamline_UTM)
 
+LSR_LOIs_clip <- st_zm(LSR_LOIs)
+
 LSR_clipped <- st_intersection(LSR_LiDAR_boundary_clip,LSR_streamline_clip)
 
 #plot and see if clipped streamline is correct
@@ -58,16 +63,15 @@ ggplot() +
   geom_sf(data = LSR_clipped) +
   coord_sf()
 
-#Combine stream segments into one. Use clipped streamline to create a buffered area from which to draw cross-sections and extract DEM data
+#Combine stream segments into one.
 
-LSR_buffer <- LSR_clipped %>% 
-  st_combine() %>% 
-  st_buffer(dist = 500)
+LSR_full <- LSR_clipped %>% 
+  st_combine()
 
-#plot and see if buffer was successfully made
+#plot and see if streamline was successfully made
 ggplot() +
   geom_sf(data = LSR_LiDAR_boundary_clip) +
-  geom_sf(data = LSR_buffer) +
+  geom_sf(data = LSR_full) +
   coord_sf()
 
 # Nice! Now make a shp file of cross-sections
@@ -75,20 +79,20 @@ ggplot() +
 # SKIP - Draw and save cross-sections --------------------------------------------
 #These lines commented out so that the dataframe is not accidentally overwritten. Commented code saved for posterity.
 
-LSR_xsxns <- mapview(LSR_buffer) %>%
-  editMap()
-
-LSR_xsxns_object <- LSR_xsxns$finished
-
-LSR_xsxns_sf <- LSR_xsxns_object %>%
-   select(geometry)
-
-#view buffer and cross-sections
-mapview(LSR_buffer) +
- mapview(LSR_xsxns_object)
-
-#Save object of cross-sections
-save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
+# LSR_xsxns <- mapview(LSR_LOIs_clip) %>%
+#   editMap()
+# 
+# LSR_xsxns_object <- LSR_xsxns$finished
+# 
+# LSR_xsxns_sf <- LSR_xsxns_object %>%
+#    select(geometry)
+# 
+# #view buffer and cross-sections
+# mapview(LSR_full) +
+#  mapview(LSR_xsxns_object)
+# 
+# #Save object of cross-sections
+# save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
 
 
 
@@ -111,7 +115,7 @@ save(LSR_xsxns_object, file = "data/GIS/LSR_xsxns.rda")
 # crs(LSR_tiff)
 # 
 # #Confirm projection of buffer layer
-# st_crs(LSR_buffer)
+# st_crs(LSR_full)
 
 #convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
 # LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
@@ -130,7 +134,7 @@ load("data/GIS/LSR_xsxns.rda")
 
 ggplot() +
   geom_sf(data = LSR_LiDAR_boundary_clip) +
-  geom_sf(data = LSR_buffer) +
+  geom_sf(data = LSR_full) +
   geom_sf(data = LSR_xsxns_object) +
   coord_sf()
 
