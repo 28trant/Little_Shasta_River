@@ -34,7 +34,7 @@ ggplotly(
     geom_line(aes(x = date_time2, y = temp_C), color = "mediumvioletred")
 )
 
-#temperature data only extends through water year 2020 (September 30, 2020). Need to add the complete water year for 2021.
+#temperature data only extends through water year 2020 (September 30, 2020). Need to add the complete water year for 2021. Also, the times all seem shifted. Replace this file with the newly downloaded data.
 
 #reformat Date as date_time
 LSR_flow_and_temp_2021 <- LSR_flow_and_temp_2021 %>% 
@@ -58,3 +58,29 @@ ggplotly(
 min(LSR_flow_2021$calc_flow_cfs)
 
 #Flows are not calculated for the lowest flows. Download stage data for water year 2021 and recalculate flows based on new rating curve.
+
+#Plot wy2021 temp data and see if there are any issues
+
+summary(LSR_flow_and_temp_2021$temp_C)
+
+ggplotly(
+  ggplot(data = LSR_flow_and_temp_2021) +
+    geom_line(aes(x = date_time, y = temp_C), color = "darkorchid3")
+)
+
+#There's one day with slightly negative temperatures. Remove.
+
+LSR_temp_all_QA <- LSR_flow_and_temp_2021 %>% 
+  filter(temp_C >= 0)
+
+ggplotly(
+  ggplot(data = LSR_temp_all_QA) +
+    geom_line(aes(x = date_time, y = temp_C), color = "darkorchid3")
+)
+
+#Save temp data as rds file
+write_rds(LSR_temp_all_QA, "data/LSR_processed/LSR_temp_2017_2021.rds")
+
+#Will remove LSR_temp_2017_2020.csv
+
+#Need to summarize daily data
