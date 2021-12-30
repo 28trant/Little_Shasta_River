@@ -183,4 +183,3 @@ ggplot(data = xsxn_df) +
   geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
 )
 
-#seems like not every cross-section includes the whole stream channel. May need to redraw cross-sections. Note that I can re-import the UTM.tiff file, and not go through the conversion step. This will save a lot of time!
