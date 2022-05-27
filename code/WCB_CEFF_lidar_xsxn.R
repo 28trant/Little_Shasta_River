@@ -100,10 +100,10 @@ ggplot() +
 
 #Following lines are to load the TIF and convert to UTM, which was already completed on the first run. Commented out, but saved for posterity.
 
-#Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
-
-#library(tiff)
-
+# Tif of Little Shasta lidar is saved in X:\ShastaRiver\SpatialData\ImageFiles\Little_Shasta\little_shasta_lidar_dsm1.tif
+#
+# library(tiff)
+# 
 # LSR_path <- "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1.tif"
 # 
 # LSR_tiff=raster(LSR_path)
@@ -116,8 +116,8 @@ ggplot() +
 # 
 # #Confirm projection of buffer layer
 # st_crs(LSR_full)
-
-#convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
+# 
+# #convert tiff to UTM projection - this takes a REALLY long time, and shouldn't be re-run, if possible. Commented out this and the extraction lines to avoid accidentally running them.
 # LSR_tiff_UTM <- projectRaster(LSR_tiff, crs = "+init=EPSG:32610")
 # 
 # #confirm new projection
@@ -125,6 +125,7 @@ ggplot() +
 # 
 # #save raster with UTM projection
 # writeRaster(LSR_tiff_UTM, filename = "data/GIS/LSR_tiff_UTM.tif")
+# writeRaster(LSR_tiff_UTM, filename = "X:/ShastaRiver/SpatialData/ImageFiles/Little_Shasta/little_shasta_lidar_dsm1_UTM.tif")
 
 # Extract xsxn elevations from raster -------------------------------------------------------------
 
@@ -156,10 +157,11 @@ xsxn_elevation <- set_names(xsxn_elevation, LSR_xsxns_object$X_leaflet_id)
 names(xsxn_elevation)
 
 xsxn_list <- map(xsxn_elevation, ~as.data.frame(.x))
-xsxn_list <- xsxn_list %>% 
-  mutate(rowid = map(., ~mutate(.x, seq(0,nrow(.x), by = 0.4572))))
 
-map(xsxn_list, ~nrow(.x))
+# xsxn_list <- xsxn_list %>% 
+#   mutate(xsxn_position = map(., ~seq(0,nrow(.x), by = 0.4572)))
+# 
+# map(xsxn_list, ~nrow(.x))
 
 xsxn_df <- bind_rows(xsxn_list, .id = "X_leaflet_id") %>% 
   mutate(elevation_m = .x) %>% 
@@ -178,8 +180,19 @@ xsxn_df %>%
 
 xsxn_sf <- left_join(LSR_xsxns_object, xsxn_df)
 
+mapview(xsxn_sf, zcol= "X_leaflet_id", legend = FALSE) +
+  mapview(LSR_LOIs_clip)
+
 ggplotly(
 ggplot(data = xsxn_df) +
   geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
 )
+
+# Everything looks good! Save as rds file
+
+# Final step: save the xsxn_df so that the elevations and geometry are saved in the same file. This will allow us to map cross-sections and already have their associated elevation profiles.
+
+write_rds(xsxn_df, "data/GIS/xsxn_elevation_w_scaled_positions.rds")
+write_rds(xsxn_sf, "data/GIS/xsxn_elevation_w_coords_and_scaled_positions.rds")
+
 
