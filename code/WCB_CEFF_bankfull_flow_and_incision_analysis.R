@@ -425,3 +425,196 @@ xsxn_LOI2[xsxn_LOI2$xsxn_id==2231, 10] <- xsxn_2231_BF_R-38.8620
 
 #BF_base_length
 xsxn_LOI2[xsxn_LOI2$xsxn_id==2231, 13] <- 38.8620-31.0896
+
+#xsxn 2244
+# define end points of bankfull channel
+xsxn_2244_BF_L <- 32.0040
+xsxn_2244_BF_R <- 34.7472
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 5:6] <- as.list(c(xsxn_2244_BF_L, xsxn_2244_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2244 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2244) %>% 
+  filter(location_m >= xsxn_2244_BF_L & location_m <= xsxn_2244_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 7] <- 2656.006-min(BF_xsxn_2244$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 8] <- 33.8328-xsxn_2244_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 9] <- 2656.040-min(BF_xsxn_2244$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 10] <- xsxn_2244_BF_R-34.2900
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2244, 13] <- 34.2900-33.832
+
+#xsxn 2305
+# define end points of bankfull channel
+xsxn_2305_BF_L <- 26.9748
+xsxn_2305_BF_R <- 34.7472
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 5:6] <- as.list(c(xsxn_2305_BF_L, xsxn_2305_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2305 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2305) %>% 
+  filter(location_m >= xsxn_2305_BF_L & location_m <= xsxn_2305_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 7] <- 2647.118-min(BF_xsxn_2305$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 8] <- 29.7180-xsxn_2305_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 9] <- 2647.176-min(BF_xsxn_2305$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 10] <- xsxn_2305_BF_R-31.0896
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2305, 13] <- 31.0896-29.7180
+
+#xsxn 2327
+# define end points of bankfull channel
+xsxn_2327_BF_L <- 30.6324
+xsxn_2327_BF_R <- 43.8912
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 5:6] <- as.list(c(xsxn_2327_BF_L, xsxn_2327_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2327 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2327) %>% 
+  filter(location_m >= xsxn_2327_BF_L & location_m <= xsxn_2327_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 7] <- 2642.217-min(BF_xsxn_2327$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 8] <- 35.6616-xsxn_2327_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 9] <- 2642.349-min(BF_xsxn_2327$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 10] <- xsxn_2327_BF_R-38.4048
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2327, 13] <- 38.4048-35.6616
+
+#xsxn 2396
+# define end points of bankfull channel
+xsxn_2396_BF_L <- 25.1460
+xsxn_2396_BF_R <- 33.8328
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 5:6] <- as.list(c(xsxn_2396_BF_L, xsxn_2396_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2396 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2396) %>% 
+  filter(location_m >= xsxn_2396_BF_L & location_m <= xsxn_2396_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 7] <- 2636.015-min(BF_xsxn_2396$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 8] <- 28.8036-xsxn_2396_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 9] <- 2635.722-min(BF_xsxn_2396$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 10] <- xsxn_2396_BF_R-32.4612
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2396, 13] <- 32.4612-28.8036
+
+#xsxn 2412
+# define end points of bankfull channel
+xsxn_2412_BF_L <- 25.1460
+xsxn_2412_BF_R <- 34.2900
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 5:6] <- as.list(c(xsxn_2412_BF_L, xsxn_2412_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2412 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2412) %>% 
+  filter(location_m >= xsxn_2412_BF_L & location_m <= xsxn_2412_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 7] <- 2623.467-min(BF_xsxn_2412$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 8] <- 27.4320-xsxn_2412_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 9] <- 2623.485-min(BF_xsxn_2412$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 10] <- xsxn_2412_BF_R-31.5468
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2412, 13] <- 31.5468-27.4320
+
+#xsxn 2499
+# define end points of bankfull channel
+xsxn_2499_BF_L <- 32.4612
+xsxn_2499_BF_R <- 34.7472
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 5:6] <- as.list(c(xsxn_2499_BF_L, xsxn_2499_BF_R))
+
+#filter points for easier calculations
+BF_xsxn_2499 <- xsxn_LOI2_all %>%
+  filter(xsxn_id == 2499) %>% 
+  filter(location_m >= xsxn_2499_BF_L & location_m <= xsxn_2499_BF_R)
+
+#Define other geometry data
+#BF_L_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 7] <- 2608.661-min(BF_xsxn_2499$elevation_m)
+
+#BF_L_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 8] <- 32.9184-xsxn_2499_BF_L
+
+#BF_R_height_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 9] <- 2608.684-min(BF_xsxn_2499$elevation_m)
+
+#BF_R_width_m
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 10] <- xsxn_2499_BF_R-33.3756
+
+#BF_base_length
+xsxn_LOI2[xsxn_LOI2$xsxn_id==2499, 13] <- 33.3756-32.9184
+
+# LOI2: Calculate bankfull flow -------------------------------------------------
+
+#When all data is identified for each cross-section, calculate:
+#BF_height: choose the minimum of the side heights 
+xsxn_LOI2$BF_h_m <- pmin(xsxn_LOI2$BF_L_h_m, xsxn_LOI2$BF_R_h_m)
+
+#BF_top_length
+xsxn_LOI2$xsxn_BF_top_length_m <- xsxn_LOI2$BF_R_m - xsxn_LOI2$BF_L_m
+
+#BF_L_length
+xsxn_LOI2$xsxn_BF_L_length_m <- sqrt((xsxn_LOI2$BF_L_h_m)^2+(xsxn_LOI2$BF_L_w_m)^2)
+
+#BF_R_length
+xsxn_LOI2$xsxn_BF_R_length_m <- sqrt((xsxn_LOI2$BF_R_h_m)^2+(xsxn_LOI2$BF_R_w_m)^2)
+
+# Wetted perimeter
+xsxn_LOI2$R_hyd_rad <- xsxn_LOI2$xsxn_BF_L_length_m+xsxn_LOI2$xsxn_BF_R_length_m+xsxn_LOI2$xsxn_BF_base_length_m
+
+#Bankfull area
+xsxn_LOI2$Area <- (1/2)*(xsxn_LOI2$xsxn_BF_top_length_m+xsxn_LOI2$xsxn_BF_base_length_m)*xsxn_LOI2$BF_h_m
+
+#Bankfull flow
+# Calculate flow (Q) using Manning's equation: 
+#      If using U.S. units: Q = (1.49/n)*A*R^(2/3)*S^(1/2)
+#      If using S.I. units: Q = (1.00/n)*A*R^(2/3)*S^(1/2)
+#Units are all metric, so will use the SI version of Manning's equation and convert to cfs using 1 cms = 35.315 cfs.
+
+xsxn_LOI2$BF_flow_cfs <- (1.00/xsxn_LOI2$Manning_n)*xsxn_LOI2$Area*xsxn_LOI2$R_hyd_rad^(2/3)*xsxn_LOI2$slope^(1/2)*35.315
+
+# LOI1: Identify bankfull geometry ----------------------------------------------
