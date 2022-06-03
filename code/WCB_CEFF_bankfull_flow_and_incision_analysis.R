@@ -210,9 +210,9 @@ xsxn_LOI3$Area <- (1/2)*(xsxn_LOI3$xsxn_BF_top_length_m+xsxn_LOI3$xsxn_BF_base_l
 # Calculate flow (Q) using Manning's equation: 
 #      If using U.S. units: Q = (1.49/n)*A*R^(2/3)*S^(1/2)
 #      If using S.I. units: Q = (1.00/n)*A*R^(2/3)*S^(1/2)
-#Units are all metric, so will use the SI version of Manning's equation and convert to cfs using 1 cms = 35.315 cfs.
+#Units are all metric, so will use the SI version of Manning's equation; the 1.00 is the k conversion factor to calculate flow in cfs.
 
-xsxn_LOI3$BF_flow_cfs <- (1.00/xsxn_LOI3$Manning_n)*xsxn_LOI3$Area*xsxn_LOI3$R_hyd_rad^(2/3)*xsxn_LOI3$slope^(1/2)*35.315
+xsxn_LOI3$BF_flow_cfs <- (1.00/xsxn_LOI3$Manning_n)*xsxn_LOI3$Area*xsxn_LOI3$R_hyd_rad^(2/3)*xsxn_LOI3$slope^(1/2)
 
 # LOI2: Identify bankfull geometry ----------------------------------------------
 
@@ -613,8 +613,8 @@ xsxn_LOI2$Area <- (1/2)*(xsxn_LOI2$xsxn_BF_top_length_m+xsxn_LOI2$xsxn_BF_base_l
 # Calculate flow (Q) using Manning's equation: 
 #      If using U.S. units: Q = (1.49/n)*A*R^(2/3)*S^(1/2)
 #      If using S.I. units: Q = (1.00/n)*A*R^(2/3)*S^(1/2)
-#Units are all metric, so will use the SI version of Manning's equation and convert to cfs using 1 cms = 35.315 cfs.
+#Units are all metric, so will use the SI version of Manning's equation; the 1.00 is the k conversion factor to calculate flow in cfs.
 
-xsxn_LOI2$BF_flow_cfs <- (1.00/xsxn_LOI2$Manning_n)*xsxn_LOI2$Area*xsxn_LOI2$R_hyd_rad^(2/3)*xsxn_LOI2$slope^(1/2)*35.315
+xsxn_LOI2$BF_flow_cfs <- (1.00/xsxn_LOI2$Manning_n)*xsxn_LOI2$Area*xsxn_LOI2$R_hyd_rad^(2/3)*xsxn_LOI2$slope^(1/2)
 
 # LOI1: Identify bankfull geometry ----------------------------------------------
