@@ -33,18 +33,12 @@ LSR_LOIs <- readRDS("data/GIS/07_lshasta_loi_comids_flowline.rds")
 LSR_LiDAR_boundary_UTM <- st_transform(LSR_LiDAR_boundary, crs = 32610)
 
 #check that project transformation worked:
+LSR_LiDAR_boundary
 LSR_LiDAR_boundary_UTM
 
 #Looks good! Repeat for streamline
 LSR_streamline_UTM <- st_transform(LSR_streamline, crs = 32610)
 
-
-# Plot and view
-ggplot() +
-  geom_sf(data = LSR_LiDAR_boundary_UTM) +
-  geom_sf(data = LSR_streamline_UTM) +
-  geom_sf(data = LSR_LOIs) +
-  coord_sf()
 
 # Wrangle spatial data ----------------------------------------------------
 #Need to drop M from UTM geometries
@@ -158,18 +152,14 @@ names(xsxn_elevation)
 
 xsxn_list <- map(xsxn_elevation, ~as.data.frame(.x))
 
-# xsxn_list <- xsxn_list %>% 
-#   mutate(xsxn_position = map(., ~seq(0,nrow(.x), by = 0.4572)))
-# 
-# map(xsxn_list, ~nrow(.x))
-
 xsxn_df <- bind_rows(xsxn_list, .id = "X_leaflet_id") %>% 
-  mutate(elevation_m = .x) %>% 
-  filter(!is.na(elevation_m)) %>% 
+  mutate(elevation_ft = .x) %>% 
+  filter(!is.na(elevation_ft)) %>% 
   mutate(X_leaflet_id = as.integer(X_leaflet_id)) %>% 
   group_by(X_leaflet_id) %>% 
   mutate(rowid = row_number()) %>% 
-  mutate(location = row_number()*0.4572) #this takes the rowid and scales it to the 1.5 ft interval of the lidar data; multiplying by the m conversion since the layer projections were converted to UTMs
+  mutate(location_m = row_number()*0.4572) %>% #this takes the rowid and scales it to the 1.5 ft interval of the lidar data; multiplying by the m conversion since the layer projections were converted to UTMs
+  mutate(location_ft = row_number()*1.5) 
 
 summary(xsxn_df)
 
@@ -185,7 +175,7 @@ mapview(xsxn_sf, zcol= "X_leaflet_id", legend = FALSE) +
 
 ggplotly(
 ggplot(data = xsxn_df) +
-  geom_line(aes(x=location, y=elevation_m, group = X_leaflet_id, color = X_leaflet_id))
+  geom_line(aes(x=location_ft, y=elevation_ft, group = X_leaflet_id, color = X_leaflet_id))
 )
 
 # Everything looks good! Save as rds file
