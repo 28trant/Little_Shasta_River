@@ -117,6 +117,22 @@ ggplotly(
     geom_line(aes(x=location_m, y=elevation_ft, group = xsxn_id, color = xsxn_id))
 )
 
+#Make plot of xsxn_1110 to use in the report.
+
+LOI3_xsxn_1110 <- xsxn_LOI3_all %>% 
+  filter(xsxn_id == "1110") %>% 
+  filter(location_m >= 32) %>% 
+  mutate(location_ft = location_m*3.28084) %>% 
+  mutate(position = location_ft-105)
+
+ggplot(data = LOI3_xsxn_1110) +
+  geom_line(aes(x=position, y = elevation_ft), color = "chocolate4") +
+  scale_y_continuous(limits = c(2909,2912)) +
+  labs(x="distance (ft)", y = "elevation (ft)") +
+  theme_bw()
+
+ggsave(filename = "output/LOI3_xsxn_1110.png", dpi = 300, width = 6, height = 3, units = "in")
+
 # Add columns to geometry data
 xsxn_LOI3$BF_L_m <- 0.0
 xsxn_LOI3$BF_R_m <- 0.0
@@ -1459,3 +1475,5 @@ LOI_all_xsxns_and_bankfull_flow <- rbind(xsxn_LOI1, xsxn_LOI2)
 LOI_all_xsxns_and_bankfull_flow <- rbind(LOI_all_xsxns_and_bankfull_flow, xsxn_LOI3)
 
 write_rds(LOI_all_xsxns_and_bankfull_flow, "output/LOI_all_xsxns_and_bankfull_flow.rds")
+
+incision_results <- readRDS("output/LOI_all_xsxns_and_bankfull_flow.rds")
