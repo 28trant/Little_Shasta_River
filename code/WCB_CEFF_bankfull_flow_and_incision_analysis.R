@@ -1203,6 +1203,21 @@ xsxn_LOI1[xsxn_LOI1$xsxn_id==3691, 10] <- xsxn_3691_BF_R-xsxn_3691_base_R
 #BF_base_length
 xsxn_LOI1[xsxn_LOI1$xsxn_id==3691, 13] <- (xsxn_3691_base_R-xsxn_3691_base_L)*3.28084
 
+#Make plot of xsxn_3691 to use in the report.
+
+LOI1_xsxn_3691 <- xsxn_LOI1_all %>% 
+  filter(xsxn_id == "3691") %>%   
+  mutate(location_ft = location_m*3.28084)  
+  
+ggplot(data = LOI1_xsxn_3691) +
+  geom_line(aes(x=location_ft, y = elevation_ft), color = "chocolate4") +
+  scale_y_continuous(limits = c(2494,2500)) +
+  scale_x_continuous(limits = c(0,125)) +
+  labs(x="distance (ft)", y = "elevation (ft)") +
+  theme_bw()
+
+ggsave(filename = "output/LOI1_xsxn_3691.png", dpi = 300, width = 6, height = 3, units = "in")
+
 #xsxn 3705
 # define end points and elevation of bankfull channel
 xsxn_3705_BF_L <- 19.2024
