@@ -1,0 +1,300 @@
+---
+title: "MWMT and MWAT"
+output: html_document
+date: "2025-09-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#check for installed packages; install if missing 
+list.of.packages <- c("tidyverse", "date", "here","janitor","lubridate","chron", "data.table" )
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+#install ecoflux to read xle files; this is separate because it's not on CRAN
+#install.packages("remotes")
+#remotes::install_github("jpshanno/ecoflux")
+
+library(tidyverse)
+library(date)
+library(here)
+library(dplyr)
+library(janitor)
+library(ecoflux)
+library(lubridate)
+library(hms)
+library(chron)
+library(data.table)
+```
+
+```{r}
+#add column names to this dataframe
+#column_names <- c("date_time", "location", "grabdata_loc", "temp_c", "data_type")
+
+MWMT_MWAT <- read.csv(here("data", "Workspace_Normalized.csv")) %>% 
+  clean_names() 
+
+MWMT_MWAT$location <- gsub( " ", "", MWMT_MWAT$location)
+MWMT_MWAT$location <- gsub( "-", "", MWMT_MWAT$location)
+#split up between sites
+diffnames <- setNames(MWMT_MWAT %>% 
+                        group_split(location), paste0("location_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv()) 
+
+#get Even Springs data from solinst
+EVN_061807292025 <- read_xle(here("data", "Solinst raw files", "2196341_EVN_2025_07_29_103130.xle")) %>%
+  clean_names()
+
+#read in all solinst files from the "EVN_data" folder and combine them into one dataframe to make it easier to work with
+one_EVN <- rbindlist(lapply(list.files(here("data", "EVN_data"), pattern="*.xle", full.names=TRUE), read_xle)) %>% 
+  mutate(date_yyyymmdd = as_date(date_yyyymmdd),
+         time_hhmmss = as.hms(time_hhmmss))
+         
+one_EVN <- one_EVN %>% mutate(
+         date_time = ymd_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
+
+#filter out selected dates (10/1/2024 - present) EVN data ends at 3/27
+one_EVN <- one_EVN %>% 
+  filter(date_yyyymmdd > '2024-10-01')
+
+
+```
+
+```{r}
+#COME HERE IF DIVERSION WEIR IS NOT LSR
+
+#
+#created new files to not mess with old code (less efficient, but it's okay)
+new_MWMT_MWAT <- MWMT_MWAT %>%
+  mutate(date_time = mdy_hm(date_time))
+
+new_MWMT_MWAT$location <- gsub( " ", "", new_MWMT_MWAT$location)
+new_MWMT_MWAT$location <- gsub( "-", "", new_MWMT_MWAT$location)
+#split up between sites
+diffnames <- setNames(new_MWMT_MWAT %>%
+                        group_split(location), paste0("location_new_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv())
+
+#group by hour and then summarize the mean temp
+LSH_hourtemps <- location_new_LSHabvHartDiv %>%
+                                group_by(date_time = floor_date(date_time, "1 hour")) %>%
+                               summarize(mean_temp = mean(temp_c))
+write.csv(LSH_hourtemps, here("data","Output_csv_files", "LSH_hourtemps.csv"))
+
+#CHANGE THIS PART IF DIVERSION WEIR IS NOT LSR
+LSR_hourtemps <- location_new_TNCLSHost %>%
+                                group_by(date_time = floor_date(date_time, "1 hour")) %>%
+                               summarize(mean_temp = mean(temp_c))
+write.csv(LSR_hourtemps, here("data","Output_csv_files", "LSR_hourtemps.csv"))
+
+EVN_hourtemps <- one_EVN %>%
+                                group_by(date_time = floor_date(date_time, "1 hour")) %>%
+                               summarize(mean_temp = mean(temperature_c))
+
+write.csv(EVN_hourtemps, here("data","Output_csv_files", "EVN_hourtemps.csv"))
+```
+
+```{r}
+#attempt to clean up EVN data
+#find interquartile range
+
+#find Q1, Q3, and interquartile range for values in points column
+# Q1 <- quantile(one_EVN$temperature_c, .25)
+# Q3 <- quantile(one_EVN$temperature_c, .75)
+# IQR <- IQR(one_EVN$temperature_c)
+#
+# #subset data where points value is outside 1.5*IQR of Q1 and Q3
+# outliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c>(Q3 + 1.5*IQR))
+# nonoutliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c<(Q3 + 1.5*IQR))
+
+# test_MDMT <- MDMT_EVN(outliers)
+# test_MDAT <- MDAT_EVN(outliers)
+# 
+#  temp_plots(test_MDAT, test_MDMT)+
+#    labs(title = "EVN Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
+#   data has giant spikes in temperature; how to change that?
+# 
+# 
+#  one_EVN_std_err <- std_err(one_EVN$temperature_c)
+
+#test
+
+
+
+```
+
+
+```{r}
+
+#make a function to separate out timeseries by day/weeks and then get the average temperature for each day
+MDAT <- function(df){df %>% 
+    mutate(date_time = mdy_hm(date_time),
+         date = date(date_time),
+         day_num = cut.Date(date, breaks = "1 day", labels = FALSE),
+         week_num = cut.Date(date, breaks = "1 week", labels = FALSE)) %>% 
+    group_by(date, week_num, day_num) %>%
+    summarize(mean_temp_c = mean(temp_c)) }
+
+#Find MWAT for each location
+MWAT <- function(df){ df %>% 
+    MDAT() %>% 
+    group_by(week_num) %>% 
+    summarize(max_mean_temp_c = max(mean_temp_c))
+}
+#do the MDAT for EVN b/c it has different parameters
+MDAT_EVN <- function(df){ df %>% 
+  mutate(day_num = cut.Date(date_yyyymmdd, breaks = "1 day", labels = FALSE),
+         week_num = cut.Date(date_yyyymmdd, breaks = "1 week", labels = FALSE),
+         date = date_yyyymmdd) %>% 
+    group_by(date, week_num, day_num) %>%  
+    summarize(mean_temp_c = mean(temperature_c))
+  }
+
+#Find MWAT for EVN
+MWAT_EVN <- function(df){ df %>% 
+  MDAT_EVN() %>% 
+    group_by(week_num) %>% 
+    summarize(max_mean_temp_c = max(mean_temp_c))
+}
+
+
+#make a function to separate out timeseries by day/week and then get the maximum temperature for each day
+MDMT <- function(df){ df %>% 
+  mutate(date_time = mdy_hm(date_time),
+         date = date(date_time), #change date from character class to date
+         day_num = cut.Date(date, breaks = "1 day", labels = FALSE), #split date data by day counts
+         week_num = cut.Date(date, breaks = "1 week", labels = FALSE)) %>% #split date data by week counts
+    group_by(date, week_num, day_num) %>% #group by day counts counts; included week in there for visual reference, but it will be used further down
+    summarize(max_temp_c = max(temp_c)) #get maximum daily temperature by the day
+  }
+
+#make a function to separate out timeseries by day/week and then get the maximum temperature for each week
+MWMT <- function(df){ df %>% 
+  MDMT() %>% #group by day counts counts; included week in there for visual reference, but it will be used further down
+    group_by(week_num) %>% #group by week counts
+    summarize(max_max_temp_c = max(max_temp_c)) #get the maximum weekly maximum temperature
+}
+
+#MDMT for EVN
+MDMT_EVN <- function(df){ df %>% 
+ mutate(day_num = cut.Date(date_yyyymmdd, breaks = "1 day", labels = FALSE),
+         week_num = cut.Date(date_yyyymmdd, breaks = "1 week", labels = FALSE),
+        date = date_yyyymmdd) %>% 
+    group_by(date, week_num, day_num) %>%
+    summarize(max_temp_c = max(temperature_c))
+}
+#find MWMT for EVN since it has different parameters
+MWMT_EVN <- function(df){ df %>% 
+    MDMT_EVN() %>% 
+    group_by(week_num) %>% 
+    summarize(max_max_temp_c = max(max_temp_c))
+}
+
+#add dates associated with week number
+MWXT_withdates <- function(MDXT, MWXT){
+ MDXT_revised <- MDXT[!duplicated(MDXT$week_num), ] %>% 
+    select(c(date, week_num))
+ MWXT_joined <- left_join(MDXT_revised, MWXT, by = "week_num")
+ MWXT_joined
+ 
+}
+
+```
+```{r}
+#apply functions created in previous code chunk
+
+#Calculate MDAT
+cowley_MDAT <- MDAT(location_Cowley_Riffle)
+diversion_MDAT <- MDAT(location_DiversionWeir)
+LSH_MDAT<- MDAT(location_LSHabvHartDiv)
+TNC_MDAT <- MDAT(location_TNCLSHost)
+EVN_MDAT <- MDAT_EVN(one_EVN)
+
+
+#Calculate MDMT
+cowley_MDMT <- MDMT(location_Cowley_Riffle)
+diversion_MDMT <- MDMT(location_DiversionWeir)
+LSH_MDMT<- MDMT(location_LSHabvHartDiv)
+TNC_MDMT <- MDMT(location_TNCLSHost)
+EVN_MDMT <- MDMT_EVN(one_EVN)
+
+
+#Get data needed for MWAT and calculate it
+cowley_MWAT <- MWAT(location_Cowley_Riffle)
+diversion_MWAT <- MWAT(location_DiversionWeir)
+LSH_MWAT <- MWAT(location_LSHabvHartDiv)
+TNC_MWAT <- MWAT(location_TNCLSHost)
+EVN_MWAT <- MWAT_EVN(one_EVN)
+
+#Get data needed for MWMT and calculate it for different locations
+cowley_MWMT <- MWMT(location_Cowley_Riffle)
+diversion_MWMT <- MWMT(location_DiversionWeir)
+LSH_MWMT <- MWMT(location_LSHabvHartDiv)
+TNC_MWMT <- MWMT(location_TNCLSHost)
+EVN_MWMT <- MWMT_EVN(one_EVN)
+
+#use function to get dates associated with week # and print it to a .csv
+cowley_MWAT_output <- MWXT_withdates(cowley_MDAT, cowley_MWAT)
+write.csv(cowley_MWAT_output, here("data","Output_csv_files", "cowley_mwat.csv"))
+
+diversion_MWAT_output <- MWXT_withdates(diversion_MDAT, diversion_MWAT)
+write.csv(diversion_MWAT_output, here("data","Output_csv_files", "diversion_mwat.csv"))
+
+EVN_MWAT_output <- MWXT_withdates(EVN_MDAT, EVN_MWAT)
+write.csv(EVN_MWAT_output, here("data","Output_csv_files", "EVN_mwat.csv"))
+
+LSH_MWAT_output <- MWXT_withdates(LSH_MDAT, LSH_MWAT)
+write.csv(LSH_MWAT_output, here("data","Output_csv_files", "LSH_mwat.csv"))
+
+TNC_MWAT_output <- MWXT_withdates(TNC_MDAT, TNC_MWAT)
+write.csv(TNC_MWAT_output, here("data","Output_csv_files", "TNC_mwat.csv"))
+```
+
+```{r}
+#create function to plot everything
+temp_plots <- function(MDAT, MDMT){
+  ggplot() +
+  geom_line(data = MDAT, aes(x = date, y = mean_temp_c, color = "gold4"), size = 1) +
+  geom_line(data = MDMT,  aes(x = date, y = max_temp_c, color = "red"), size = 1) +
+    scale_color_manual(name ="Measurement Type:", values = c("gold4", "red"), labels = c("red" = "Daily Max", "gold4" = "Daily Mean"))+
+theme(legend.position = "bottom") 
+}
+```
+
+
+
+```{r}
+#plot data for Cowley
+temp_plots(cowley_MDAT, cowley_MDMT) +
+  labs(title = "Cowley Site Temperature Data", x = "Date", y = "Stream Temperature (\u00B0C)")
+  
+```
+
+```{r}
+#plot data for diversion
+temp_plots(diversion_MDAT, diversion_MDMT)+
+  labs(title = "Diversion Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
+```
+```{r}
+#plot data for LSH
+temp_plots(LSH_MDAT, LSH_MDMT)+
+  labs(title = "LSH Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
+```
+
+```{r}
+#plot data for TNC
+temp_plots(TNC_MDAT, TNC_MDMT)+
+  labs(title = "TNC Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
+```
+
+```{r}
+#plot data for EVN
+temp_plots(EVN_MDAT, EVN_MDMT)+
+  labs(title = "EVN Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
+```
+
+
+
+
+

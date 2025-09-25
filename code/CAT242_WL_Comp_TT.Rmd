@@ -1,0 +1,136 @@
+---
+title: "WL_Compensation"
+output: html_document
+date: "2025-08-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#check for installed packages; install if missing 
+list.of.packages <- c("tidyverse", "date", "here","janitor","lubridate","chron" )
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+#install ecoflux to read xle files; this is separate because it's not on CRAN
+#install.packages("remotes")
+#remotes::install_github("jpshanno/ecoflux")
+
+library(tidyverse)
+library(date)
+library(here)
+library(dplyr)
+library(janitor)
+library(ecoflux)
+library(lubridate)
+library(hms)
+library(chron)
+```
+
+```{r}
+#test round to see if manual compensation is close enough to solinst compensated data
+
+#read in solinst data
+uncompensated_data <- read_xle(here("data", "Solinst raw files", "2196341_EVN_2025_06_17_220445.xle")) %>%
+  clean_names()
+uncompensated_data <- uncompensated_data %>%   
+  mutate(date_yyyymmdd = as_date(date_yyyymmdd),
+         time_hhmmss = as.hms(time_hhmmss), 
+         date_time = ymd_hms(paste0(uncompensated_data$date_yyyymmdd, uncompensated_data$time_hhmmss)) %>% round_date( unit = "15 minutes") #round to the nearest 15 minutes so that it matches with the data from the website
+         )
+  #round_date(time_hhmmss)
+
+#read in compensated data for testing (4/24 - 6/17)
+compensated_data <- read_xle(here("data", "Solinst compensated files", "2196341_EVN_2025_06_17_220445Compensated.xle"))%>%
+  clean_names()
+compensated_data <- compensated_data %>% 
+  mutate(date_yyyymmdd = as_date(date_yyyymmdd),
+         time_hhmmss = as.hms(time_hhmmss), 
+         date_time = ymd_hms(paste0(compensated_data$date_yyyymmdd, compensated_data$time_hhmmss)) %>% 
+           round_date( unit = "15 minutes")
+         )
+
+#create a function to manually compensate
+manual_compensation <- function(df) {df %>% 
+  mutate( elevation_ft = 2762,
+         elevation_m = elevation_ft * 0.3048,
+         #Evan Springs elevation ~ 2996.85ft/913.44m from google earth
+         evanspring_ele_m = 913.44,
+         #elevation_difference
+         elevation_diff_m = (evanspring_ele_m - elevation_m)/826,
+         elevation_diff_ft = ((evanspring_ele_m*3.281) - elevation_ft)/826,
+         watercol_equivalent_ft = level_kpa *.334553,#1kPa = .334553 ft water column equivalent; .101972 m/kPa water column equivalent
+         ele_diff = ((evanspring_ele_m - elevation_m)/826), #(ele level logger - ele weatherstation) /826
+         watercol_equivalent_m = level_kpa * .101972,
+         manual_compensation_ft = (((level_m*3.281) + elevation_diff_ft)- watercol_equivalent_ft),
+         manual_compensation_m = ((level_m + elevation_diff_m)- watercol_equivalent_m) 
+)}
+
+#sol_baro_data purely for testing purposes
+sol_baro_data <- read_xle(here("data", "Solinst raw files", "2197653_EVN_BARO_2025_06_17_215946.xle"))%>%
+  clean_names()
+sol_baro_data <- sol_baro_data %>% 
+  mutate(date_yyyymmdd = as_date(date_yyyymmdd),
+         time_hhmmss = as.hms(time_hhmmss), 
+         date_time = ymd_hms(paste0(sol_baro_data$date_yyyymmdd, sol_baro_data$time_hhmmss))%>% 
+           round_date(unit = "15 minutes")) 
+
+#combine baro and wl data
+sol_baro_wl <- merge(uncompensated_data, sol_baro_data, by = "date_time")
+
+#perform compensation
+manual_compensated_data_test <- sol_baro_wl %>% 
+ manual_compensation()
+
+
+
+```
+
+```{r}
+#read in data 
+#baro data from KCAMONTA81 weather station: 12/1/2024 - 1/31/2025
+KCAMONTA81 <- read.csv(here("data", "KCAMONTA81.csv")) %>% clean_names() %>% 
+  mutate(pressure_k_pa = pressure_h_pa/10,
+         pressure_in_hg = pressure_k_pa * .2953)
+#isolate the pressure data +date/time
+MONTA81_kPA <- KCAMONTA81 %>% 
+  select(date, time, pressure_k_pa) 
+#Add necessary data for manual compensation
+MONTA81_kPA <- MONTA81_kPA %>%   
+  mutate(time_24hr =parse_date_time(time, 'H:M p'),
+         elevation_ft = 2762,
+         elevation_m = elevation_ft * 0.3048,
+         #Evan Springs elevation ~ 2996.85ft/913.44m from google earth
+         evanspring_ele_m = 913.44,
+         #elevation_difference
+         elevation_diff_m = (evanspring_ele_m - elevation_m)/826,
+         date_yyyymmdd = mdy(date))
+
+#Change time_24hr format to 24 hour format and then create a date_time column combining the date and 24 hr time columns
+MONTA81_kPA$time_24hr <- format(MONTA81_kPA$time_24hr, format = '%H:%M') 
+  
+MONTA81_kPA <-MONTA81_kPA %>% 
+  mutate(date_time = paste(date_yyyymmdd, time_24hr),
+         date_time = ymd_hm(date_time))
+
+
+
+#combine uncompensated data with baro measurements
+
+
+#add uncompensated data and make sure that everything matches up in terms of timing
+#(uncompensated data + elevation difference) - water column equivalent = manual compensation
+
+```
+```{r}
+#perform compensation
+manual_compensated_data <- MONTA81_kPA %>% 
+  mutate(ele_diff = ((evanspring_ele_m - elevation_m)/826), #(ele level logger - ele weatherstation) /826
+         watercol_equivalent_m = pressure_k_pa * .101972,
+         manual_compensation = ((level_m + ele_diff)- watercol_equivalent_m))#1kPa = .334553 ft water column equivalent; .101972 m water column equivalent
+```
+
+
+
