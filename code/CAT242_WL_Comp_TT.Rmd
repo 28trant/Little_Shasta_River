@@ -33,7 +33,7 @@ library(chron)
 #test round to see if manual compensation is close enough to solinst compensated data
 
 #read in solinst data
-uncompensated_data <- read_xle(here("data", "Solinst raw files", "2196341_EVN_2025_06_17_220445.xle")) %>%
+uncompensated_data <- read_xle(here("data", "data_TT", "Solinst raw files", "2196341_EVN_2025_06_17_220445.xle")) %>%
   clean_names()
 uncompensated_data <- uncompensated_data %>%   
   mutate(date_yyyymmdd = as_date(date_yyyymmdd),
@@ -43,7 +43,7 @@ uncompensated_data <- uncompensated_data %>%
   #round_date(time_hhmmss)
 
 #read in compensated data for testing (4/24 - 6/17)
-compensated_data <- read_xle(here("data", "Solinst compensated files", "2196341_EVN_2025_06_17_220445Compensated.xle"))%>%
+compensated_data <- read_xle(here("data","data_TT", "Solinst compensated files", "2196341_EVN_2025_06_17_220445Compensated.xle"))%>%
   clean_names()
 compensated_data <- compensated_data %>% 
   mutate(date_yyyymmdd = as_date(date_yyyymmdd),
@@ -69,7 +69,7 @@ manual_compensation <- function(df) {df %>%
 )}
 
 #sol_baro_data purely for testing purposes
-sol_baro_data <- read_xle(here("data", "Solinst raw files", "2197653_EVN_BARO_2025_06_17_215946.xle"))%>%
+sol_baro_data <- read_xle(here("data", "data_TT","Solinst raw files", "2197653_EVN_BARO_2025_06_17_215946.xle"))%>%
   clean_names()
 sol_baro_data <- sol_baro_data %>% 
   mutate(date_yyyymmdd = as_date(date_yyyymmdd),
@@ -91,7 +91,7 @@ manual_compensated_data_test <- sol_baro_wl %>%
 ```{r}
 #read in data 
 #baro data from KCAMONTA81 weather station: 12/1/2024 - 1/31/2025
-KCAMONTA81 <- read.csv(here("data", "KCAMONTA81.csv")) %>% clean_names() %>% 
+KCAMONTA81 <- read.csv(here("data","data_TT", "KCAMONTA81.csv")) %>% clean_names() %>% 
   mutate(pressure_k_pa = pressure_h_pa/10,
          pressure_in_hg = pressure_k_pa * .2953)
 #isolate the pressure data +date/time
