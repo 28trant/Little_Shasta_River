@@ -34,9 +34,10 @@ library(data.table)
 #add column names to this dataframe
 #column_names <- c("date_time", "location", "grabdata_loc", "temp_c", "data_type")
 
-MWMT_MWAT <- read.csv(here("data", "Workspace_Normalized.csv")) %>% 
+MWMT_MWAT <- read.csv(here("data", "data_TT", "Workspace_Normalized.csv")) %>% 
   clean_names() 
 
+#take out spaces and dashes to make names easier
 MWMT_MWAT$location <- gsub( " ", "", MWMT_MWAT$location)
 MWMT_MWAT$location <- gsub( "-", "", MWMT_MWAT$location)
 #split up between sites
@@ -44,11 +45,11 @@ diffnames <- setNames(MWMT_MWAT %>%
                         group_split(location), paste0("location_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv()) 
 
 #get Even Springs data from solinst
-EVN_061807292025 <- read_xle(here("data", "Solinst raw files", "2196341_EVN_2025_07_29_103130.xle")) %>%
+EVN_061807292025 <- read_xle(here("data","data_TT", "Solinst raw files", "2196341_EVN_2025_07_29_103130.xle")) %>%
   clean_names()
 
 #read in all solinst files from the "EVN_data" folder and combine them into one dataframe to make it easier to work with
-one_EVN <- rbindlist(lapply(list.files(here("data", "EVN_data"), pattern="*.xle", full.names=TRUE), read_xle)) %>% 
+one_EVN <- rbindlist(lapply(list.files(here("data","data_TT", "EVN_data"), pattern="*.xle", full.names=TRUE), read_xle)) %>% 
   mutate(date_yyyymmdd = as_date(date_yyyymmdd),
          time_hhmmss = as.hms(time_hhmmss))
          
@@ -80,19 +81,19 @@ diffnames <- setNames(new_MWMT_MWAT %>%
 LSH_hourtemps <- location_new_LSHabvHartDiv %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temp_c))
-write.csv(LSH_hourtemps, here("data","Output_csv_files", "LSH_hourtemps.csv"))
+write.csv(LSH_hourtemps, here("data","data_TT","Output_csv_files", "LSH_hourtemps.csv"))
 
 #CHANGE THIS PART IF DIVERSION WEIR IS NOT LSR
 LSR_hourtemps <- location_new_TNCLSHost %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temp_c))
-write.csv(LSR_hourtemps, here("data","Output_csv_files", "LSR_hourtemps.csv"))
+write.csv(LSR_hourtemps, here("data","data_TT","Output_csv_files", "LSR_hourtemps.csv"))
 
 EVN_hourtemps <- one_EVN %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temperature_c))
 
-write.csv(EVN_hourtemps, here("data","Output_csv_files", "EVN_hourtemps.csv"))
+write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemps.csv"))
 ```
 
 ```{r}
@@ -236,19 +237,19 @@ EVN_MWMT <- MWMT_EVN(one_EVN)
 
 #use function to get dates associated with week # and print it to a .csv
 cowley_MWAT_output <- MWXT_withdates(cowley_MDAT, cowley_MWAT)
-write.csv(cowley_MWAT_output, here("data","Output_csv_files", "cowley_mwat.csv"))
+write.csv(cowley_MWAT_output, here("data","data_TT","Output_csv_files", "cowley_mwat.csv"))
 
 diversion_MWAT_output <- MWXT_withdates(diversion_MDAT, diversion_MWAT)
-write.csv(diversion_MWAT_output, here("data","Output_csv_files", "diversion_mwat.csv"))
+write.csv(diversion_MWAT_output, here("data","data_TT","Output_csv_files", "diversion_mwat.csv"))
 
 EVN_MWAT_output <- MWXT_withdates(EVN_MDAT, EVN_MWAT)
-write.csv(EVN_MWAT_output, here("data","Output_csv_files", "EVN_mwat.csv"))
+write.csv(EVN_MWAT_output, here("data","data_TT","Output_csv_files", "EVN_mwat.csv"))
 
 LSH_MWAT_output <- MWXT_withdates(LSH_MDAT, LSH_MWAT)
-write.csv(LSH_MWAT_output, here("data","Output_csv_files", "LSH_mwat.csv"))
+write.csv(LSH_MWAT_output, here("data","data_TT","Output_csv_files", "LSH_mwat.csv"))
 
 TNC_MWAT_output <- MWXT_withdates(TNC_MDAT, TNC_MWAT)
-write.csv(TNC_MWAT_output, here("data","Output_csv_files", "TNC_mwat.csv"))
+write.csv(TNC_MWAT_output, here("data","data_TT","Output_csv_files", "TNC_mwat.csv"))
 ```
 
 ```{r}
