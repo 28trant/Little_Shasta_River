@@ -52,7 +52,7 @@ EVN_061807292025 <- read_xle(here("data","data_TT", "Solinst raw files", "219634
 one_EVN <- rbindlist(lapply(list.files(here("data","data_TT", "EVN_data"), pattern="*.xle", full.names=TRUE), read_xle)) %>% 
   mutate(date_yyyymmdd = as_date(date_yyyymmdd),
          time_hhmmss = as.hms(time_hhmmss))
-         
+#make date_time as a class that works with dates (lubridate package)
 one_EVN <- one_EVN %>% mutate(
          date_time = ymd_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
 
@@ -69,7 +69,8 @@ one_EVN <- one_EVN %>%
 #
 #created new files to not mess with old code (less efficient, but it's okay)
 new_MWMT_MWAT <- MWMT_MWAT %>%
-  mutate(date_time = mdy_hm(date_time))
+  mutate(date_time = mdy_hm(date_time)) %>% 
+  filter(date_time >= "2024-10-01 00:00:00" & date_time < "2025-10-02 00:00:00")
 
 new_MWMT_MWAT$location <- gsub( " ", "", new_MWMT_MWAT$location)
 new_MWMT_MWAT$location <- gsub( "-", "", new_MWMT_MWAT$location)
@@ -78,6 +79,11 @@ diffnames <- setNames(new_MWMT_MWAT %>%
                         group_split(location), paste0("location_new_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv())
 
 #group by hour and then summarize the mean temp
+CWL_hourtemps <- location_new_Cowley_Riffle %>%
+                                group_by(date_time = floor_date(date_time, "1 hour")) %>%
+                               summarize(mean_temp = mean(temp_c))
+write.csv(CWL_hourtemps, here("data","data_TT","Output_csv_files", "CWL_hourtemps.csv"))
+
 LSH_hourtemps <- location_new_LSHabvHartDiv %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temp_c))
@@ -250,6 +256,24 @@ write.csv(LSH_MWAT_output, here("data","data_TT","Output_csv_files", "LSH_mwat.c
 
 TNC_MWAT_output <- MWXT_withdates(TNC_MDAT, TNC_MWAT)
 write.csv(TNC_MWAT_output, here("data","data_TT","Output_csv_files", "TNC_mwat.csv"))
+
+#use function to get dates associated with week # and print to a .csv (MWMT)
+#use function to get dates associated with week # and print it to a .csv
+cowley_MWMT_output <- MWXT_withdates(cowley_MDMT, cowley_MWMT)
+write.csv(cowley_MWAT_output, here("data","data_TT","Output_csv_files", "cowley_mwmt.csv"))
+
+diversion_MWMT_output <- MWXT_withdates(diversion_MDMT, diversion_MWMT)
+write.csv(diversion_MWAT_output, here("data","data_TT","Output_csv_files", "diversion_mwmt.csv"))
+
+EVN_MWMT_output <- MWXT_withdates(EVN_MDMT, EVN_MWMT)
+write.csv(EVN_MWAT_output, here("data","data_TT","Output_csv_files", "EVN_mwmt.csv"))
+
+LSH_MWMT_output <- MWXT_withdates(LSH_MDMT, LSH_MWMT)
+write.csv(LSH_MWAT_output, here("data","data_TT","Output_csv_files", "LSH_mwmt.csv"))
+
+TNC_MWMT_output <- MWXT_withdates(TNC_MDMT, TNC_MWMT)
+write.csv(TNC_MWAT_output, here("data","data_TT","Output_csv_files", "TNC_mwmt.csv"))
+
 ```
 
 ```{r}
