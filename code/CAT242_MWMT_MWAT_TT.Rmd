@@ -35,7 +35,11 @@ library(data.table)
 #column_names <- c("date_time", "location", "grabdata_loc", "temp_c", "data_type")
 
 MWMT_MWAT <- read.csv(here("data", "data_TT", "Workspace_Normalized.csv")) %>% 
-  clean_names() 
+  clean_names() %>% 
+   mutate(date_time = mdy_hm(date_time),
+          date = date(date_time),
+          time = time(date_time)) %>% 
+  filter(date >= "2024-10-01" & date < "2025-10-02") #filter between 2024 (Oct 2024 - Oct 2025) water year; change if looking at other dates!!!!
 
 #take out spaces and dashes to make names easier
 MWMT_MWAT$location <- gsub( " ", "", MWMT_MWAT$location)
@@ -44,47 +48,98 @@ MWMT_MWAT$location <- gsub( "-", "", MWMT_MWAT$location)
 diffnames <- setNames(MWMT_MWAT %>% 
                         group_split(location), paste0("location_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv()) 
 
-#get Even Springs data from solinst
-EVN_061807292025 <- read_xle(here("data","data_TT", "Solinst raw files", "2196341_EVN_2025_07_29_103130.xle")) %>%
-  clean_names()
+# #get Even Springs data from solinst
+# EVN_061807292025 <- read_xle(here("data","data_TT", "Solinst raw files", "2196341_EVN_2025_07_29_103130.xle")) %>%
+#   clean_names()
+# 
+# EVN_filenames <- list.files(path = here("data", "data_TT", "EVN_data"), pattern = ".xle")
+# 
+# dataframe_names <- EVN_filenames %>% str_replace_all(c(".xle" = "", "./" = ""))
+# 
+# 
+# for(i in 1:length(EVN_filenames)) {                              # Head of for-loop
+#   assign(paste0("data", i),                                   # Read and store data frames
+#          read_xle(paste0(here("data", "data_TT", "EVN_data"),
+#                    EVN_filenames[i])))
+# }
+# 
+# dat <- lapply(EVN_filenames, FUN = function(x) read_xle(x)) %>%
+# set_names(dataframe_names)
+# 
+# 
+# dat <- lapply(EVN_filenames, read_xle)
+# 
+# #EVN_filenames<- file_path_sans_ext(EVN_filenames)
+# 
+# listofdfs <- data.frame()
+# 
+# my_dfs <- lapply(EVN_filenames, read_xle)
+# 
+#   
+# EVN_names <- substr(EVN_filenames,1,10)
+#   setNames(MWMT_MWAT %>% 
+#                         group_split(location), paste0("location_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv()) 
 
 #read in all solinst files from the "EVN_data" folder and combine them into one dataframe to make it easier to work with
-one_EVN <- rbindlist(lapply(list.files(here("data","data_TT", "EVN_data"), pattern="*.xle", full.names=TRUE), read_xle)) %>% 
-  mutate(date_yyyymmdd = as_date(date_yyyymmdd),
-         time_hhmmss = as.hms(time_hhmmss))
-         
-one_EVN <- one_EVN %>% mutate(
-         date_time = ymd_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
+one_EVN <- rbindlist(lapply(list.files(here("data","data_TT", "EVN_data"), pattern="*.csv", full.names=TRUE), read.csv)) %>% 
+  clean_names() 
+
+# one_EVN$date_mmddyyyy <- with(one_EVN, mdy(one_EVN$date) + hms(one_EVN$time))
+#take one_EVN data from .csv files and transfer it to .xle files
+one_EVN <- one_EVN %>% 
+  mutate(date_yyyymmdd = mdy(date),
+  time_hhmmss = format(strptime(one_EVN$time, "%I:%M:%S %p"), format="%H:%M:%S"),
+  temperature_c = temperature) #to match with old code
+  
+one_EVN<- one_EVN %>% mutate(time_hhmmss = as_hms(one_EVN$time_hhmmss),
+  date_time = as.POSIXct(paste(date_yyyymmdd, time_hhmmss), format="%Y-%m-%d %H:%M:%S"))
+
+#make date_time as a class that works with dates (lubridate package)
+# one_EVN <- one_EVN %>% mutate(
+#          date_time = mdy_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
+# one_EVN$datetime <- with(one_EVN, mdy(one_EVN$date_mmddyyyy) + hms(one_EVN$time_hhmmss))
+# one_EVN$date_time <- as.POSIXct(as.character(paste(one_EVN$date_mmddyyyy, one_EVN$time_hhmmss)), format="%m/%d/%Y %H.%M.%S")
 
 #filter out selected dates (10/1/2024 - present) EVN data ends at 3/27
 one_EVN <- one_EVN %>% 
-  filter(date_yyyymmdd > '2024-10-01')
-
-
+  filter(date_time >= '2024-10-01 00:00:00') %>% 
+  distinct(.keep_all = TRUE)
 ```
-
 ```{r}
+#old code; delete if not needed
 #COME HERE IF DIVERSION WEIR IS NOT LSR
 
 #
-#created new files to not mess with old code (less efficient, but it's okay)
-new_MWMT_MWAT <- MWMT_MWAT %>%
-  mutate(date_time = mdy_hm(date_time))
+# #created new files to not mess with old code (less efficient, but it's okay)
+# new_MWMT_MWAT <- MWMT_MWAT %>%
+#   mutate(date_time = mdy_hm(date_time),
+#          date = date(date_time),
+#          time = time(date_time))
+# new_MWMT_MWAT <- new_MWMT_MWAT %>% 
+#   filter(date >= "2024-10-01" & date < "2025-10-02") #filter between 2024 (Oct 2024 - Oct 2025) water year; change if looking at other dates!!!!
+# 
+# new_MWMT_MWAT$location <- gsub( " ", "", new_MWMT_MWAT$location)
+# new_MWMT_MWAT$location <- gsub( "-", "", new_MWMT_MWAT$location)
+# #split up between sites
+# diffnames <- setNames(new_MWMT_MWAT %>%
+#                         group_split(location), paste0("location_new_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv())
+```
 
-new_MWMT_MWAT$location <- gsub( " ", "", new_MWMT_MWAT$location)
-new_MWMT_MWAT$location <- gsub( "-", "", new_MWMT_MWAT$location)
-#split up between sites
-diffnames <- setNames(new_MWMT_MWAT %>%
-                        group_split(location), paste0("location_new_", unique(MWMT_MWAT$location))) %>% list2env(envir = globalenv())
+```{r}
 
 #group by hour and then summarize the mean temp
-LSH_hourtemps <- location_new_LSHabvHartDiv %>%
+CWL_hourtemps <- location_Cowley_Riffle %>%
+                                group_by(date_time = floor_date(date_time, "1 hour")) %>%
+                               summarize(mean_temp = mean(temp_c))
+write.csv(CWL_hourtemps, here("data","data_TT","Output_csv_files", "CWL_hourtemps.csv"))
+
+LSH_hourtemps <- location_LSHabvHartDiv %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temp_c))
 write.csv(LSH_hourtemps, here("data","data_TT","Output_csv_files", "LSH_hourtemps.csv"))
 
 #CHANGE THIS PART IF DIVERSION WEIR IS NOT LSR
-LSR_hourtemps <- location_new_TNCLSHost %>%
+LSR_hourtemps <- location_TNCLSHost %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
                                summarize(mean_temp = mean(temp_c))
 write.csv(LSR_hourtemps, here("data","data_TT","Output_csv_files", "LSR_hourtemps.csv"))
@@ -97,32 +152,40 @@ write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemp
 ```
 
 ```{r}
-#attempt to clean up EVN data
-#find interquartile range
+#Find Min-Max from July to Sept for EVN
 
-#find Q1, Q3, and interquartile range for values in points column
-# Q1 <- quantile(one_EVN$temperature_c, .25)
-# Q3 <- quantile(one_EVN$temperature_c, .75)
-# IQR <- IQR(one_EVN$temperature_c)
-#
-# #subset data where points value is outside 1.5*IQR of Q1 and Q3
-# outliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c>(Q3 + 1.5*IQR))
-# nonoutliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c<(Q3 + 1.5*IQR))
+start_date = '2025-07-01'
+end_date = '2025-10-01'
 
-# test_MDMT <- MDMT_EVN(outliers)
-# test_MDAT <- MDAT_EVN(outliers)
-# 
-#  temp_plots(test_MDAT, test_MDMT)+
-#    labs(title = "EVN Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
-#   data has giant spikes in temperature; how to change that?
-# 
-# 
-#  one_EVN_std_err <- std_err(one_EVN$temperature_c)
+minmaxmean <- function(df, start, end){
+  clipped_df <- df %>% 
+    filter(date_time >= start) %>% 
+  filter(date_time <= end)
+  
+    min_temp <- min(df$temperature_c)
+    max_temp <- max(df$temperature_c)
+    mean_temp <- mean(df$temperature_c)
+    
+    print (paste("min temp is", min_temp))
+    print(paste("max temp is", max_temp))
+    print(paste("mean temp is", mean_temp))
+    
+    clipped_df
+}
 
-#test
+Q1_EVN <- minmaxmean(one_EVN, start_date, end_date)
 
+mean_temp <- mean
 
+  clipped_df <- one_EVN %>% 
+    filter(date_time >= start_date) %>% 
+  filter(date_time <= end_date)
+  
+min(clipped_df$temperature_c)
+max(clipped_df$temperature_c)
+mean(clipped_df$temperature_c)
 
+write.csv(Q1_EVN, here("data","data_TT","Output_csv_files", "EVN_jul_sep_2025.csv"))
 ```
 
 
@@ -130,7 +193,8 @@ write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemp
 
 #make a function to separate out timeseries by day/weeks and then get the average temperature for each day
 MDAT <- function(df){df %>% 
-    mutate(date_time = mdy_hm(date_time),
+    #date_time = mdy_hm(date_time), use to be in mutate
+    mutate(
          date = date(date_time),
          day_num = cut.Date(date, breaks = "1 day", labels = FALSE),
          week_num = cut.Date(date, breaks = "1 week", labels = FALSE)) %>% 
@@ -162,7 +226,8 @@ MWAT_EVN <- function(df){ df %>%
 
 #make a function to separate out timeseries by day/week and then get the maximum temperature for each day
 MDMT <- function(df){ df %>% 
-  mutate(date_time = mdy_hm(date_time),
+    #date_time = mdy_hm(date_time),  
+    mutate(
          date = date(date_time), #change date from character class to date
          day_num = cut.Date(date, breaks = "1 day", labels = FALSE), #split date data by day counts
          week_num = cut.Date(date, breaks = "1 week", labels = FALSE)) %>% #split date data by week counts
@@ -237,7 +302,7 @@ EVN_MWMT <- MWMT_EVN(one_EVN)
 
 #use function to get dates associated with week # and print it to a .csv
 cowley_MWAT_output <- MWXT_withdates(cowley_MDAT, cowley_MWAT)
-write.csv(cowley_MWAT_output, here("data","data_TT","Output_csv_files", "cowley_mwat.csv"))
+write.csv(cowley_MWAT_output, here("data","data_TT","Output_csv_files", "CWL_mwat.csv"))
 
 diversion_MWAT_output <- MWXT_withdates(diversion_MDAT, diversion_MWAT)
 write.csv(diversion_MWAT_output, here("data","data_TT","Output_csv_files", "diversion_mwat.csv"))
@@ -250,6 +315,24 @@ write.csv(LSH_MWAT_output, here("data","data_TT","Output_csv_files", "LSH_mwat.c
 
 TNC_MWAT_output <- MWXT_withdates(TNC_MDAT, TNC_MWAT)
 write.csv(TNC_MWAT_output, here("data","data_TT","Output_csv_files", "TNC_mwat.csv"))
+
+#use function to get dates associated with week # and print to a .csv (MWMT)
+#use function to get dates associated with week # and print it to a .csv
+cowley_MWMT_output <- MWXT_withdates(cowley_MDMT, cowley_MWMT)
+write.csv(cowley_MWAT_output, here("data","data_TT","Output_csv_files", "CWL_mwmt.csv"))
+
+diversion_MWMT_output <- MWXT_withdates(diversion_MDMT, diversion_MWMT)
+write.csv(diversion_MWAT_output, here("data","data_TT","Output_csv_files", "diversion_mwmt.csv"))
+
+EVN_MWMT_output <- MWXT_withdates(EVN_MDMT, EVN_MWMT)
+write.csv(EVN_MWAT_output, here("data","data_TT","Output_csv_files", "EVN_mwmt.csv"))
+
+LSH_MWMT_output <- MWXT_withdates(LSH_MDMT, LSH_MWMT)
+write.csv(LSH_MWAT_output, here("data","data_TT","Output_csv_files", "LSH_mwmt.csv"))
+
+TNC_MWMT_output <- MWXT_withdates(TNC_MDMT, TNC_MWMT)
+write.csv(TNC_MWAT_output, here("data","data_TT","Output_csv_files", "TNC_mwmt.csv"))
+
 ```
 
 ```{r}
