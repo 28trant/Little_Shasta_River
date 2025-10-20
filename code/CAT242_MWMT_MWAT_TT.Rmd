@@ -84,30 +84,26 @@ diffnames <- setNames(MWMT_MWAT %>%
 one_EVN <- rbindlist(lapply(list.files(here("data","data_TT", "EVN_data"), pattern="*.csv", full.names=TRUE), read.csv)) %>% 
   clean_names() 
 
-one_EVN$date_mmddyyyy <- with(one_EVN, mdy(one_EVN$date) + hms(one_EVN$time))
+# one_EVN$date_mmddyyyy <- with(one_EVN, mdy(one_EVN$date) + hms(one_EVN$time))
+#take one_EVN data from .csv files and transfer it to .xle files
+one_EVN <- one_EVN %>% 
+  mutate(date_yyyymmdd = mdy(date),
+  time_hhmmss = format(strptime(one_EVN$time, "%I:%M:%S %p"), format="%H:%M:%S"),
+  temperature_c = temperature) #to match with old code
+  
+one_EVN<- one_EVN %>% mutate(time_hhmmss = as_hms(one_EVN$time_hhmmss),
+  date_time = as.POSIXct(paste(date_yyyymmdd, time_hhmmss), format="%Y-%m-%d %H:%M:%S"))
 
-test <-mdy(one_EVN$date)
-
-one_EVN <- one_EVN <- one_EVN %>% 
-  mutate(dates_mmddyy = mdy(one_EVN$date),
-         time_hhmmss = format(strptime(time, "%I:%M %p"), format="%H:%M:%S"))
-
-
-
-     date_yyyymmdd = as_date(date_yyyymmdd),
-         time_hhmmss = as.date(time))
 #make date_time as a class that works with dates (lubridate package)
-one_EVN <- one_EVN %>% mutate(
-         date_time = ymd_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
+# one_EVN <- one_EVN %>% mutate(
+#          date_time = mdy_hms(paste0(one_EVN$date_yyyymmdd, one_EVN$time_hhmmss)))
+# one_EVN$datetime <- with(one_EVN, mdy(one_EVN$date_mmddyyyy) + hms(one_EVN$time_hhmmss))
+# one_EVN$date_time <- as.POSIXct(as.character(paste(one_EVN$date_mmddyyyy, one_EVN$time_hhmmss)), format="%m/%d/%Y %H.%M.%S")
 
 #filter out selected dates (10/1/2024 - present) EVN data ends at 3/27
 one_EVN <- one_EVN %>% 
-  filter(date_yyyymmdd > '2024-10-01') %>% 
+  filter(date_time >= '2024-10-01 00:00:00') %>% 
   distinct(.keep_all = TRUE)
-
-
-
-
 ```
 ```{r}
 #old code; delete if not needed
@@ -156,32 +152,40 @@ write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemp
 ```
 
 ```{r}
-#attempt to clean up EVN data
-#find interquartile range
+#Find Min-Max from July to Sept for EVN
 
-#find Q1, Q3, and interquartile range for values in points column
-# Q1 <- quantile(one_EVN$temperature_c, .25)
-# Q3 <- quantile(one_EVN$temperature_c, .75)
-# IQR <- IQR(one_EVN$temperature_c)
-#
-# #subset data where points value is outside 1.5*IQR of Q1 and Q3
-# outliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c>(Q3 + 1.5*IQR))
-# nonoutliers <- subset(one_EVN, one_EVN$temperature_c<(Q1 - 1.5*IQR) | one_EVN$temperature_c<(Q3 + 1.5*IQR))
+start_date = '2025-07-01'
+end_date = '2025-10-01'
 
-# test_MDMT <- MDMT_EVN(outliers)
-# test_MDAT <- MDAT_EVN(outliers)
-# 
-#  temp_plots(test_MDAT, test_MDMT)+
-#    labs(title = "EVN Site Temperature Data", data, x = "Date", y = "Stream Temperature (\u00B0C)")
-#   data has giant spikes in temperature; how to change that?
-# 
-# 
-#  one_EVN_std_err <- std_err(one_EVN$temperature_c)
+minmaxmean <- function(df, start, end){
+  clipped_df <- df %>% 
+    filter(date_time >= start) %>% 
+  filter(date_time <= end)
+  
+    min_temp <- min(df$temperature_c)
+    max_temp <- max(df$temperature_c)
+    mean_temp <- mean(df$temperature_c)
+    
+    print (paste("min temp is", min_temp))
+    print(paste("max temp is", max_temp))
+    print(paste("mean temp is", mean_temp))
+    
+    clipped_df
+}
 
-#test
+Q1_EVN <- minmaxmean(one_EVN, start_date, end_date)
 
+mean_temp <- mean
 
+  clipped_df <- one_EVN %>% 
+    filter(date_time >= start_date) %>% 
+  filter(date_time <= end_date)
+  
+min(clipped_df$temperature_c)
+max(clipped_df$temperature_c)
+mean(clipped_df$temperature_c)
 
+write.csv(Q1_EVN, here("data","data_TT","Output_csv_files", "EVN_jul_sep_2025.csv"))
 ```
 
 
