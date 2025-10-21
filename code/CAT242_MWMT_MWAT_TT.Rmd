@@ -102,7 +102,8 @@ one_EVN<- one_EVN %>% mutate(time_hhmmss = as_hms(one_EVN$time_hhmmss),
 
 #filter out selected dates (10/1/2024 - present) EVN data ends at 3/27
 one_EVN <- one_EVN %>% 
-  filter(date_time >= '2024-10-01 00:00:00') %>% 
+  filter(date_time >= '2024-10-01 00:00:00',
+         date_time <= '2025-10-01 00:00:00') %>% 
   distinct(.keep_all = TRUE)
 ```
 ```{r}
@@ -146,9 +147,11 @@ write.csv(LSR_hourtemps, here("data","data_TT","Output_csv_files", "LSR_hourtemp
 
 EVN_hourtemps <- one_EVN %>%
                                 group_by(date_time = floor_date(date_time, "1 hour")) %>%
-                               summarize(mean_temp = mean(temperature_c))
+                               summarize(mean_temp = mean(temperature_c),
+                                         mean_level = mean(level)
+                                         )
 
-write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemps.csv"))
+write.csv(EVN_hourtemps, here("data","data_TT","Output_csv_files", "EVN_hourtemps_2025_WY.csv"))
 ```
 
 ```{r}
@@ -175,6 +178,9 @@ minmaxmean <- function(df, start, end){
 
 Q1_EVN <- minmaxmean(one_EVN, start_date, end_date)
 
+Q1_EVN_output <- Q1_EVN %>% 
+  select(date, time, ms, level, temperature)
+
 mean_temp <- mean
 
   clipped_df <- one_EVN %>% 
@@ -185,7 +191,7 @@ min(clipped_df$temperature_c)
 max(clipped_df$temperature_c)
 mean(clipped_df$temperature_c)
 
-write.csv(Q1_EVN, here("data","data_TT","Output_csv_files", "EVN_jul_sep_2025.csv"))
+write.csv(Q1_EVN_output, here("data","data_TT","Output_csv_files", "EVN_jul_sep_2025.csv"))
 ```
 
 
